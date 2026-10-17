@@ -52,7 +52,7 @@ class UpdateTests(unittest.TestCase):
 
     def tearDown(self):
         upstream.ROOT = REAL_ROOT
-        upstream.LOCK = REAL_ROOT / 'upstream/pstack-lock.json'
+        upstream.select_source('pstack')
         self.temp.cleanup()
 
     def run_git(self, *args):
@@ -237,6 +237,144 @@ class UpdateTests(unittest.TestCase):
         upstream.LOCK.write_text(upstream.LOCK.read_text() + '\n')
         with self.assertRaisesRegex(ValueError, 'lock changed'):
             self.apply()
+
+
+class MattUpdateTests(unittest.TestCase):
+    run_git = UpdateTests.run_git
+    put = UpdateTests.put
+    commit = UpdateTests.commit
+    stage = UpdateTests.stage
+    decisions = UpdateTests.decisions
+    apply = UpdateTests.apply
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='matt-update-')
+        self.base = Path(self.temp.name)
+        self.source = self.base / 'source'
+        self.port = self.base / 'port'
+        self.source.mkdir()
+        self.port.mkdir()
+        subprocess.run(['git', 'init', '-q', str(self.source)], check=True)
+        self.run_git('config', 'user.name', 'Test')
+        self.run_git('config', 'user.email', 'test@example.invalid')
+        upstream.ROOT = self.port
+        upstream.select_source('mattpocock')
+        self.skill = '---\nname: demo\ndescription: Test an upstream update.\n---\n\nBaseline guidance.\n\nTail stays.\n'
+        self.put('skills/engineering/demo/SKILL.md', self.skill)
+        self.put('package.json', '{"version":"1.0.0","devDependencies":{"example":"1"}}\n')
+        self.put('README.md', 'Source readme\n')
+        self.put('LICENSE', 'MIT fixture\n')
+        self.old = self.commit('base')
+        (self.port / 'skills/mattpocock-demo').mkdir(parents=True)
+        self.canonical = self.port / 'skills/mattpocock-demo/SKILL.md'
+        self.canonical.write_text(self.skill.replace('name: demo', 'name: mattpocock-demo') +
+                                  '\nRead [runtime](../pstack-runtime/SKILL.md).\n')
+        shutil.copytree(REAL_ROOT / 'skills/pstack-runtime', self.port / 'skills/pstack-runtime',
+                        ignore=shutil.ignore_patterns('node_modules', '__pycache__'))
+        (self.port / 'upstream').mkdir()
+        (self.port / 'scripts').mkdir()
+        shutil.copy2(REAL_ROOT / 'scripts/validate-skills.py', self.port / 'scripts/validate-skills.py')
+        shutil.copytree(REAL_ROOT / '.claude-plugin', self.port / '.claude-plugin')
+        shutil.copy2(REAL_ROOT / 'package.json', self.port / 'package.json')
+        self.other_lock = self.port / 'upstream/pstack-lock.json'
+        self.other_lock.write_text('{"skills":[],"commit":"other-source"}\n')
+        upstream.write_json(upstream.LOCK, {'repository':'fixture', 'commit':self.old,
+                'sourceFiles':upstream.inventory(self.source, self.old),
+                'sourceModes':upstream.modes(self.source, self.old),
+                'skills':[{'skill':'mattpocock-demo','source':'skills/engineering/demo'}]})
+        self.output = self.base / 'stage'
+
+    def tearDown(self):
+        upstream.ROOT = REAL_ROOT
+        upstream.select_source('pstack')
+        self.temp.cleanup()
+
+    def test_clean_update_preserves_namespace_and_other_source(self):
+        before_other = self.other_lock.read_bytes()
+        self.put('skills/engineering/demo/SKILL.md', self.skill.replace('Baseline guidance.', 'Improved guidance.'))
+        new = self.commit('improve')
+        plan = self.stage()
+        self.assertEqual(plan['source'], 'mattpocock')
+        self.assertEqual(plan['versions'], {'mattpocock':'1.0.0'})
+        self.assertEqual(plan['entries'][0]['status'], 'clean-merge')
+        self.decisions(plan)
+        self.apply()
+        self.assertIn('name: mattpocock-demo', self.canonical.read_text())
+        self.assertIn('Improved guidance.', self.canonical.read_text())
+        self.assertEqual(self.other_lock.read_bytes(), before_other)
+        self.assertTrue((self.port / 'upstream/updates/mattpocock' / (new + '.json')).is_file())
+
+    def test_entire_repository_docs_and_metadata_are_tracked(self):
+        self.put('.claude-plugin/plugin.json', '{"dependencies":["new-source"]}\n')
+        self.put('README.md', 'Depends on another plugin now.\n')
+        self.commit('dependency outside skill directories')
+        plan = self.stage()
+        self.assertEqual(len(plan['entries']), 2)
+        self.assertTrue(all(e['target'] is None for e in plan['entries']))
+        self.decisions(plan)
+        with self.assertRaisesRegex(ValueError, 'Unmapped'):
+            self.apply()
+        self.decisions(plan, 'keep')
+        self.apply()
+
+    def test_new_skill_must_be_ported_before_apply(self):
+        self.put('skills/new-category/new-demo/SKILL.md', self.skill.replace('name: demo', 'name: new-demo'))
+        self.commit('new workflow')
+        plan = self.stage()
+        self.assertEqual(plan['entries'][0]['target'], 'skills/mattpocock-new-demo/SKILL.md')
+        self.decisions(plan)
+        old_lock = upstream.LOCK.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'validation failed'):
+            self.apply()
+        self.assertEqual(upstream.LOCK.read_bytes(), old_lock)
+        p = self.output / plan['entries'][0]['merged']
+        p.write_text(p.read_text().replace('name: new-demo','name: mattpocock-new-demo') +
+                     '\nRead [runtime](../pstack-runtime/SKILL.md).\n')
+        self.apply()
+        self.assertTrue((self.port / 'skills/mattpocock-new-demo/SKILL.md').exists())
+
+    def test_cross_source_stage_cannot_apply(self):
+        self.put('README.md', 'changed\n')
+        self.commit('change')
+        self.stage()
+        upstream.select_source('pstack')
+        with self.assertRaisesRegex(ValueError, 'another upstream source'):
+            self.apply()
+
+    def test_same_name_in_another_category_needs_mapping_review(self):
+        self.put('skills/productivity/demo/SKILL.md', self.skill)
+        self.commit('collision')
+        plan = self.stage()
+        self.decisions(plan, 'keep')
+        with self.assertRaisesRegex(ValueError, 'name collision'):
+            self.apply()
+
+    def test_conflicting_adaptation_is_not_overwritten(self):
+        self.canonical.write_text(self.canonical.read_text().replace('Baseline guidance.', 'Our guidance.'))
+        self.put('skills/engineering/demo/SKILL.md', self.skill.replace('Baseline guidance.', 'Their guidance.'))
+        self.commit('conflict')
+        plan = self.stage()
+        self.assertEqual(plan['entries'][0]['status'], 'conflict')
+        self.decisions(plan)
+        with self.assertRaisesRegex(ValueError, 'conflict markers'):
+            self.apply()
+
+    def test_deletion_can_retain_local_workflow(self):
+        (self.source / 'skills/engineering/demo/SKILL.md').unlink()
+        self.commit('remove workflow')
+        plan = self.stage()
+        self.decisions(plan, 'keep')
+        self.apply()
+        self.assertTrue(self.canonical.exists())
+
+    def test_pending_review_refuses_baseline_advance(self):
+        self.put('README.md', 'changed\n')
+        self.commit('change')
+        self.stage()
+        before = upstream.LOCK.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'decision'):
+            self.apply()
+        self.assertEqual(upstream.LOCK.read_bytes(), before)
 
 
 if __name__ == '__main__':

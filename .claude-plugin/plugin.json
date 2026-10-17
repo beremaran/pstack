@@ -1,7 +1,9 @@
 {
   "name": "pstack",
-  "version": "0.15.25-port.2",
-  "description": "Portable pstack workflows, full companion kit, and Benny workflows.",
-  "author": {"name": "beremaran; upstream Lauren Tan and Eric Zakariasson"},
+  "version": "0.15.25-port.3",
+  "description": "Portable pstack, companion kit, Benny, and Matt Pocock workflows for coding agents.",
+  "author": {
+    "name": "beremaran; upstream Lauren Tan and Eric Zakariasson; Matt Pocock"
+  },
   "license": "MIT"
 }

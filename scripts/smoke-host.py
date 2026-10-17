@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SENTINEL = 'This file belongs to the user. Leave it unchanged.\n'
 
 
-def prepare(agent, output):
+def prepare(agent, output, skill='tdd'):
+    if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', skill) or not (ROOT / 'skills' / skill / 'SKILL.md').is_file():
+        raise ValueError('Choose an existing canonical skill by name')
     if output.exists():
         raise ValueError('Use a fresh output directory')
     output.mkdir(parents=True, mode=0o700)
@@ -25,7 +27,7 @@ def prepare(agent, output):
     discovery = {'claude': '.claude/skills', 'codex': '.agents/skills',
                  'opencode': '.opencode/skills', 'pi': '.pi/skills'}[agent]
     brief = project / 'brief.md'
-    brief.write_text(f'''Read {project / discovery / 'tdd/SKILL.md'} and its pstack-runtime dependency.
+    brief.write_text(f'''Read {project / discovery / skill / 'SKILL.md'} and its pstack-runtime dependency.
 Use that TDD workflow to fix clamp.py. The function must clamp a number into
 0..ceiling inclusive; ceiling is nonnegative. Use standard-library unittest.
 Write and run a failing regression test before editing production code, then
@@ -124,12 +126,13 @@ def main():
     create = sub.add_parser('prepare')
     create.add_argument('--agent', required=True, choices=['claude', 'codex', 'opencode', 'pi'])
     create.add_argument('--output', required=True, type=Path)
+    create.add_argument('--skill', default='tdd', help='canonical TDD workflow to exercise')
     check = sub.add_parser('verify')
     check.add_argument('--project', required=True, type=Path)
     check.add_argument('--transcript', type=Path)
     args = parser.parse_args()
     if args.action == 'prepare':
-        prepare(args.agent, args.output.expanduser().resolve())
+        prepare(args.agent, args.output.expanduser().resolve(), args.skill)
         return 0
     return verify(args.project.expanduser().resolve(), args.transcript)
 

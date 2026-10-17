@@ -1,8 +1,14 @@
 {
   "name": "beremaran-pstack-skills",
-  "version": "0.15.25-port.2",
+  "version": "0.15.25-port.3",
   "private": true,
-  "description": "Portable pstack and companion workflows for coding agents",
-  "keywords": ["pi-package"],
-  "pi": {"skills": ["./skills"]}
+  "description": "Portable pstack, companion kit, Benny, and Matt Pocock workflows for coding agents.",
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
 }

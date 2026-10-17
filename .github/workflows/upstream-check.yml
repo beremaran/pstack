@@ -1,4 +1,4 @@
-name: Check pstack upstream
+name: Check vendored skill upstreams
 
 on:
   workflow_dispatch:
@@ -12,6 +12,14 @@ jobs:
   compare:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source: pstack
+            repository: cursor/plugins
+          - source: mattpocock
+            repository: mattpocock/skills
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -20,16 +28,18 @@ jobs:
       - name: Fetch source packs
         shell: bash
         run: |
-          git clone --depth 1 --filter=blob:none --sparse https://github.com/cursor/plugins.git "$RUNNER_TEMP/pstack-upstream"
-          git -C "$RUNNER_TEMP/pstack-upstream" sparse-checkout set pstack cursor-team-kit
-          base=$(python -c 'import json; print(json.load(open("upstream/pstack-lock.json"))["commit"])')
-          git -C "$RUNNER_TEMP/pstack-upstream" fetch --depth 1 origin "$base"
+          git clone --depth 1 --filter=blob:none --sparse "https://github.com/${{ matrix.repository }}.git" "$RUNNER_TEMP/source-upstream"
+          if [ "${{ matrix.source }}" = pstack ]; then
+            git -C "$RUNNER_TEMP/source-upstream" sparse-checkout set pstack cursor-team-kit
+          fi
+          base=$(python -c 'import json; print(json.load(open("upstream/${{ matrix.source }}-lock.json"))["commit"])')
+          git -C "$RUNNER_TEMP/source-upstream" fetch --depth 1 origin "$base"
       - name: Compare and stage for review
         id: compare
         shell: bash
         run: |
-          python scripts/upstream.py check --checkout "$RUNNER_TEMP/pstack-upstream" --ref origin/main > "$RUNNER_TEMP/upstream-report.json"
-          python scripts/upstream.py stage --checkout "$RUNNER_TEMP/pstack-upstream" --ref origin/main --output "$RUNNER_TEMP/upstream-review"
+          python scripts/upstream.py check --source "${{ matrix.source }}" --checkout "$RUNNER_TEMP/source-upstream" --ref origin/main > "$RUNNER_TEMP/upstream-report.json"
+          python scripts/upstream.py stage --source "${{ matrix.source }}" --checkout "$RUNNER_TEMP/source-upstream" --ref origin/main --output "$RUNNER_TEMP/upstream-review"
           python - <<'PY'
           import json, os
           from pathlib import Path
@@ -45,7 +55,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: steps.compare.outputs.changed == 'true'
         with:
-          name: pstack-upstream-review
+          name: ${{ matrix.source }}-upstream-review
           path: |
             ${{ runner.temp }}/upstream-report.json
             ${{ runner.temp }}/upstream-review/

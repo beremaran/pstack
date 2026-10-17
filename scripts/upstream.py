@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare, stage, and explicitly apply reviewed pstack upstream updates."""
+"""Compare, stage, and explicitly apply reviewed vendored skill updates."""
 import argparse
 import hashlib
 import json
@@ -11,6 +11,14 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'upstream/pstack-lock.json'
 PACKS = ('pstack', 'cursor-team-kit')
+SOURCE = 'pstack'
+
+
+def select_source(name):
+    global SOURCE, LOCK, PACKS
+    SOURCE = name
+    LOCK = ROOT / f'upstream/{name}-lock.json'
+    PACKS = ('pstack', 'cursor-team-kit') if name == 'pstack' else ()
 
 
 def git(checkout, *args, check=True):
@@ -41,6 +49,12 @@ def inventory(checkout, ref):
 
 def target_for(source):
     parts = source.split('/')
+    if SOURCE == 'mattpocock':
+        if len(parts) >= 4 and parts[0] == 'skills':
+            return 'skills/mattpocock-' + parts[2] + '/' + '/'.join(parts[3:]), False
+        if source == 'LICENSE':
+            return 'upstream/mattpocock-LICENSE', False
+        return None, True
     pack = parts[0]
     if len(parts) >= 4 and parts[1] == 'skills':
         return 'skills/' + '/'.join(parts[2:]), False
@@ -141,10 +155,16 @@ def stage(checkout, ref, output):
         entries.append({'target': target if mapped else None, 'sources': sources, 'status': status,
                         'localHash': digest(content), 'localMode': local.stat().st_mode & 0o777 if local and local.exists() else None, 'merged': str(merged.relative_to(output)) if merged else None,
                         'decision': 'pending', 'reason': ''})
-    plan = {'baseCommit': lock['commit'], 'commit': commit, 'lockHash': digest(LOCK.read_bytes()),
+    plan = {'source': SOURCE, 'baseCommit': lock['commit'], 'commit': commit, 'lockHash': digest(LOCK.read_bytes()),
             'sourceFiles': current, 'sourceModes': modes(checkout, commit), 'entries': entries}
     # Version metadata is source evidence, never copied into a host manifest blindly.
     plan['versions'] = {}
+    if SOURCE == 'mattpocock':
+        info = json.loads(blob(checkout, commit, 'package.json'))
+        plan['versions']['mattpocock'] = info['version']
+        for key in ['dependencies', 'devDependencies']:
+            if info.get(key):
+                plan.setdefault('declaredDependencies', {})[key] = info[key]
     for pack in PACKS:
         info = json.loads(blob(checkout, commit, pack + '/.cursor-plugin/plugin.json'))
         plan['versions'][pack] = info['version']
@@ -157,6 +177,8 @@ def stage(checkout, ref, output):
 
 def _apply(output):
     plan = json.loads((output / 'plan.json').read_text())
+    if plan.get('source', 'pstack') != SOURCE:
+        raise ValueError('Stage belongs to another upstream source; select the matching --source')
     if digest(LOCK.read_bytes()) != plan['lockHash']:
         raise ValueError('Source lock changed since staging; stage again')
     writes = []
@@ -198,8 +220,11 @@ def _apply(output):
         mode = (0o755 if incoming_modes == {'100755'} else 0o644) if changed_mode else (before_mode or 0o644)
         writes.append((target, before, content, before_mode, mode))
     lock = json.loads(LOCK.read_text())
-    lock.update(commit=plan['commit'], sourceFiles=plan['sourceFiles'], sourceModes=plan['sourceModes'],
-                pstackVersion=plan['versions']['pstack'], companionVersion=plan['versions']['cursor-team-kit'])
+    lock.update(commit=plan['commit'], sourceFiles=plan['sourceFiles'], sourceModes=plan['sourceModes'])
+    if SOURCE == 'pstack':
+        lock.update(pstackVersion=plan['versions']['pstack'], companionVersion=plan['versions']['cursor-team-kit'])
+    else:
+        lock['version'] = plan['versions']['mattpocock']
     # Reconcile tracked skill entries, including new upstream skills and removed-but-retained ports.
     mappings = {}
     for source in plan['sourceFiles']:
@@ -211,7 +236,9 @@ def _apply(output):
                 if name in mappings and mappings[name] != source_dir:
                     raise ValueError(f'Upstream skill name collision requires a mapping update: {name}')
                 mappings[name] = source_dir
-    lock['skills'] = [{'skill': name, 'source': source} for name, source in sorted(mappings.items())]
+    lock['skills'] = [{'skill': name, 'source': source,
+                       **({'stability': source.split('/')[1]} if SOURCE == 'mattpocock' else {})}
+                      for name, source in sorted(mappings.items())]
     # Refuse an acknowledged update that leaves a newly required skill unported.
     future = {str(path.relative_to(ROOT)): content for path, _, content, _, _ in writes}
     for entry in lock['skills']:
@@ -219,6 +246,8 @@ def _apply(output):
         if target in future and future[target] is None or target not in future and not local_path(target).is_file():
             raise ValueError(f'Required upstream skill is missing: {entry["skill"]}')
     journal_dir = ROOT / 'upstream/updates'
+    if SOURCE != 'pstack':
+        journal_dir = journal_dir / SOURCE
     journal_path = journal_dir / (plan['commit'] + '.json')
     if journal_path.exists():
         raise ValueError('An update receipt already exists for this commit')
@@ -241,8 +270,8 @@ def _apply(output):
         checked = subprocess.run([sys.executable, str(ROOT / 'scripts/validate-skills.py')], capture_output=True)
         if checked.returncode:
             raise ValueError('Port validation failed; changes rolled back. Review staged content and run the validator.')
-        journal_dir.mkdir(exist_ok=True)
-        write_json(journal_path, {'baseCommit': plan['baseCommit'], 'commit': plan['commit'],
+        journal_dir.mkdir(parents=True, exist_ok=True)
+        write_json(journal_path, {'source': SOURCE, 'baseCommit': plan['baseCommit'], 'commit': plan['commit'],
                                   'decisions': [{k: entry[k] for k in ['target', 'sources', 'decision', 'reason']} for entry in plan['entries']]})
     except BaseException:
         LOCK.write_bytes(old_lock)
@@ -275,14 +304,18 @@ def main():
     sub = parser.add_subparsers(dest='action', required=True)
     for action in ['check', 'stage']:
         command = sub.add_parser(action)
+        command.add_argument('--source', choices=['pstack', 'mattpocock'], default='pstack')
         command.add_argument('--checkout', required=True, type=Path)
         command.add_argument('--ref', default='origin/main')
         command.add_argument('--fail-if-changed', action='store_true', help='exit 3 when updates are available')
         command.add_argument('--fetch', action='store_true', help='fetch origin before comparing')
         if action == 'stage':
             command.add_argument('--output', required=True, type=Path)
-    sub.add_parser('apply').add_argument('--stage', required=True, type=Path)
+    apply_command = sub.add_parser('apply')
+    apply_command.add_argument('--stage', required=True, type=Path)
+    apply_command.add_argument('--source', choices=['pstack', 'mattpocock'], default='pstack')
     args = parser.parse_args()
+    select_source(args.source)
     if args.action == 'apply':
         apply(args.stage.expanduser().resolve())
         return

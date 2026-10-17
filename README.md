@@ -10,7 +10,7 @@ Agent documentation: [Codex](https://developers.openai.com/codex/skills), [Claud
 
 ## Pstack bundle
 
-This repository ports pstack 0.15.25 and its complete cursor-team-kit 1.2.0 companion into 81 canonical skills. Start with `poteto-mode` for engineering work, `poteto-help` for routing, and `setup-pstack` for optional per-role model configuration. See [migration scope and dependencies](docs/pstack-port.md) and [verification results](docs/pstack-verification.md).
+This repository ports pstack 0.15.25 and its complete cursor-team-kit 1.2.0 companion into 81 canonical skills. Start with `poteto-mode` for engineering work, `poteto-help` for routing, and `setup-pstack` for optional per-role model configuration. See [migration scope and dependencies](docs/pstack-port.md) and [verification results](docs/pstack-verification.md). The installer also includes 38 namespaced [Matt Pocock workflows](docs/mattpocock-port.md), for 119 skills in total.
 
 ### Install skills
 
@@ -106,3 +106,20 @@ python scripts/upstream.py stage --checkout /path/to/cursor-plugins --ref origin
 ```
 
 After reviewing every entry and merge candidate, use `upstream.py apply --stage /tmp/pstack-review`. It refuses stale local files and unresolved decisions, preserves intentional divergences, and rolls back validation failures. Run `python scripts/test-upstream.py` and `python -m unittest discover -s skills/pstack-runtime/scripts -p 'test_*.py'` when changing this tooling.
+
+### Matt Pocock workflows
+
+Also vendored: all **38** skills from [mattpocock/skills](https://github.com/mattpocock/skills), including its seven experimental workflows, pinned to upstream version 1.3.1. They use `mattpocock-*` names to preserve the existing pstack variants. Start with [mattpocock-ask-matt](skills/mattpocock-ask-matt/SKILL.md). The same installer and native packages now include **119** canonical skills.
+
+[Coverage, adaptations, and prerequisites](docs/mattpocock-port.md) and [verification evidence](docs/mattpocock-verification.md) distinguish portable workflows from optional native integrations. Explicit-only intent and Codex policies are retained where possible; equivalent discovery filtering is not claimed for every host.
+
+The weekly read-only upstream check covers both repositories. To inspect and take Matt Pocock updates while preserving local adaptations:
+
+```sh
+python scripts/upstream.py check --source mattpocock --checkout /path/to/mattpocock-skills --fetch
+python scripts/upstream.py stage --source mattpocock --checkout /path/to/mattpocock-skills --output /tmp/mattpocock-review
+# Review plan.json, resolve candidates, and record every decision and reason.
+python scripts/upstream.py apply --source mattpocock --stage /tmp/mattpocock-review
+```
+
+See [upstream updates](docs/upstream-updates.md) for review gates, rollback, and receipts. pstack's existing commands continue to work without `--source`.

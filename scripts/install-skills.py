@@ -55,7 +55,8 @@ def main():
             created.append(notices)
             for source in (ROOT / 'upstream').glob('*-LICENSE'):
                 shutil.copy2(source, notices / source.name)
-            shutil.copy2(ROOT / 'upstream/pstack-lock.json', notices / 'pstack-lock.json')
+            for source in (ROOT / 'upstream').glob('*-lock.json'):
+                shutil.copy2(source, notices / source.name)
     except Exception:
         for path in reversed(created):
             shutil.rmtree(path)

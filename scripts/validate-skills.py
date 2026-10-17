@@ -46,10 +46,16 @@ for path in (ROOT / 'skills').rglob('*.md'):
             errors.append(f'{path.relative_to(ROOT)}: broken bundled link {target}')
     if re.search(r'\.cursor/|subagent_type|cloud_base_branch|api2\.cursor\.sh|SendToUser|update_state', text):
         errors.append(f'{path.relative_to(ROOT)}: unmigrated host API/path')
-lock = json.loads((ROOT / 'upstream/pstack-lock.json').read_text())
-for record in lock['skills']:
-    if not (ROOT / 'skills' / record['skill'] / 'SKILL.md').is_file():
-        errors.append(f'Missing upstream skill: {record["skill"]}')
+owners = {}
+for lock_path in sorted((ROOT / 'upstream').glob('*-lock.json')):
+    lock = json.loads(lock_path.read_text())
+    for record in lock['skills']:
+        name = record['skill']
+        if name in owners:
+            errors.append(f'Skill owned by multiple sources: {name}')
+        owners[name] = lock_path.name
+        if not (ROOT / 'skills' / name / 'SKILL.md').is_file():
+            errors.append(f'Missing upstream skill: {name}')
 json.loads((ROOT / '.claude-plugin/plugin.json').read_text())
 assert json.loads((ROOT / 'package.json').read_text())['pi']['skills'] == ['./skills']
 if errors:
