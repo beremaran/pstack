@@ -1,0 +1,18 @@
+flowchart LR
+hub["Read applicable principle leaves; apply only to matching<br/>decisions"]
+ hub --> n0["principle-outcome-oriented-execution<br/>Apply during planned rewrites and migrations with explicit phase<br/>boundaries. Converge on the target architecture; don't<br/>preserve smooth intermediate states with throwaway compatibility<br/>code."]
+ click n0 "../../skills/principle-outcome-oriented-execution/SKILL.md" "Read principle"
+ hub --> n1["principle-prove-it-works<br/>Apply after completing a task, before declaring done. Verify<br/>against the real artifact (run the feature, read the actual<br/>value, inspect the diff), not a proxy, self-report, or 'it<br/>compiles."]
+ click n1 "../../skills/principle-prove-it-works/SKILL.md" "Read principle"
+ hub --> n2["principle-redesign-from-first-principles<br/>Apply when integrating a new requirement into an existing<br/>design."]
+ click n2 "../../skills/principle-redesign-from-first-principles/SKILL.md" "Read principle"
+ hub --> n3["principle-separate-before-serializing-shared-state<br/>Apply when concurrent actors might write to the same file,<br/>branch, key, or state object. Eliminate the sharing first;<br/>serialize structurally only when one shared writer is a real<br/>invariant."]
+ click n3 "../../skills/principle-separate-before-serializing-shared-state/SKILL.md" "Read principle"
+ hub --> n4["principle-sequence-verifiable-units<br/>Apply to multi-step work (sweeps, migrations, runs of similar<br/>edits) and to how you stack commits and PRs. Break work into<br/>small units that each end in a verifiable state, check each<br/>before the next, and order delivery so the sequence proves<br/>itself to a reviewer."]
+ click n4 "../../skills/principle-sequence-verifiable-units/SKILL.md" "Read principle"
+ hub --> n5["principle-subtract-before-you-add<br/>Apply when sequencing an addition, refactor, or rewrite. Remove<br/>dead code, redundant validators, and stub references first, then<br/>build on the simpler base."]
+ click n5 "../../skills/principle-subtract-before-you-add/SKILL.md" "Read principle"
+ hub --> n6["principle-test-behavior-not-implementation<br/>Apply when you write, change, or keep a test. Assert what the<br/>code's users can observe, so that the test fails when that<br/>behavior breaks and keeps passing when only the internals<br/>change."]
+ click n6 "../../skills/principle-test-behavior-not-implementation/SKILL.md" "Read principle"
+ hub --> n7["principle-type-system-discipline<br/>Apply when designing types, reviewing a function signature, or<br/>writing code in any statically-typed language. Make illegal<br/>states unrepresentable, brand semantic primitives, parse<br/>external data at boundaries, exhaust variants, derive from<br/>authoritative schemas."]
+ click n7 "../../skills/principle-type-system-discipline/SKILL.md" "Read principle"

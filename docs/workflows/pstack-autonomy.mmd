@@ -1,0 +1,19 @@
+flowchart TB
+kind{"Execution scope?"} -->|one task| auto["Autonomous run: checkable predicate + attempt / time bounds +<br/>real wake mechanism"]
+ auto --> iteration["Smallest evidence-backed change; verify unit; keep progress or<br/>discard"] --> log["show-me-your-work checkpoint; fix reversible side blockers in<br/>separate PRs"] --> predicate{"Done predicate?"}
+ predicate -->|yes| finish["Report evidence and stop"]
+ predicate -->|no; budget remains| iteration
+ predicate -->|budget / dead end| halt["Persist checkpoint and unmet predicate; stop"]
+ kind -->|standing program| frame["Orchestrate: countable units, tracks, budget; small enough →<br/>Autonomous run"]
+ frame --> init["Initialize store, standing orders, frontier and ledger"] --> pilot["Pilot one unit end to end; repair brief / verifier before<br/>scaling"] --> scale["Rolling window of isolated workers; scoped briefs; one writer<br/>per branch"] --> drain["Queue completions; batch drain; classify and update tables"] --> land["Verify current heads; land continuously via one topology writer"]
+ land --> more{"More ready units within budget?"}
+ more -->|yes| scale
+ more -->|no| close["Reconcile every worker; confirm real predicate, ledger and<br/>trail; preserve store"]
+ kind -->|independent PR queue + merge authority| full["Autopilot-full: operator gates; one owner per PR off trunk"]
+ full --> build["Owner builds, opens early, cleans code, rebases before<br/>code-ready,<br/>self-proves and babysits; pushes trail and each head"] --> swarm["Root swarm at code-ready head: gates + live behavior + diff and<br/>receipt audits"] --> findings{"Proven findings?"}
+ findings -->|yes| fix["Single fix-forward to owner; red tests across same-defect sites"] --> build
+ findings -->|no| prep["Owner checks landing base; rebase / merge-result checks where<br/>needed; green CI per head"] --> verdict["Root audits receipts; fresh verifier for minor drift, full swarm<br/>for major change"] --> merge["Owner merges only covered patch; honor operator / forge gates"]
+ kind -->|coupled queue / operator lands| stack["Autopilot-stack: same owner and verification lifecycle; owners<br/>never merge"]
+ stack --> topology["Root alone rebases and retargets; dependency-ordered base chain"] --> stackready["STACK-READY; absorb drift bottom-up and recheck verdicts"] --> deliver["Deliver linear reviewed stack; operator lands; freeze writes<br/>during landing"]
+ full -.-> audit["Bounded audit ticks: reread playbooks; probe side effects;<br/>replace stuck workers;<br/>root countersigns gate changes only when authorized; operator<br/>stop → zero writes"]
+ stack -.-> audit

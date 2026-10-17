@@ -1,0 +1,13 @@
+flowchart TB
+ task["Chosen playbook"] --> understand["how: assess complexity → explore complex subsystem →<br/>synthesize → overview, concepts, mechanics, file map and gotchas"]
+ understand --> architecture["architect: ground → sketch alternatives through arena →<br/>optional agreement → implement against sketch;<br/>wrong architecture → re-ground, subtract, resketch"]
+ architecture --> execute["poteto-agent: scoped execution role; parent owns review"]
+ task --> swarm["swarm: frame predicate and partition / race policy →<br/>isolated outputs and exact revisions → fan out → aggregate coverage → report"]
+ task --> arena["arena: frame task and private rubric → isolated candidates →<br/>cross-judge → pick base → graft winning parts → verify combined artifact"]
+ task --> interrogate["interrogate: pin scope and intent → independent adversarial reviewers →<br/>synthesize agreement → lead judgment: act / consider / note / dismiss"]
+ execute --> surface{"Verification surface?"}
+ surface -->|browser / Electron| ui["control-ui: launch and discover harness → select correct app →<br/>snapshot → one structural action → fresh snapshot →<br/>verify state change → retain before / after evidence"]
+ surface -->|CLI / TUI| cli["control-cli: isolated reproducible workspace and harness →<br/>capture terminal → one action → wait for concrete pattern →<br/>save transcript / profiles → clean shutdown"]
+ surface -->|performance claim| bench["benchmark-checklist: explain limiter; production tuning;<br/>physical limits; errors and output correctness;<br/>at least 5 alternating runs per side; median and range;<br/>end-to-end significance; prove work ran in timed region"]
+ task -.-> trail["show-me-your-work: record decisions and predicate changes;<br/>audit against scoped transcript; cross-model trail review;<br/>surface attention items and missing evidence"]
+ trail --> ketchup["ketchup: gather changes since last update → concise operator briefing;<br/>visualize verified measurements or structural facts when useful"]

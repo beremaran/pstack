@@ -1,0 +1,19 @@
+flowchart TB
+request["Task or question"] --> help["poteto-help: choose a skill or playbook"]
+ help --> runtime["pstack-runtime: authorization, capabilities, models, history<br/>scope"]
+ runtime --> setup["setup-pstack: optional role model configuration"]
+ setup --> mode["poteto-mode: select playbook and copy its steps to todos"]
+ mode --> kind{"What kind of work?"}
+ kind --> investigation["Investigation: how → cited explanation or tradeoffs"]
+ kind --> build["Feature / Bug fix / Refactoring / Visual parity"]
+ kind --> measure["Perf issue / Hillclimb / Runtime forensics / Trace forensics"]
+ kind --> design["Prototype / Multi-phase or multi-PR plan"]
+ kind --> skills["Authoring or modifying a skill / Eval"]
+ kind --> pr["Opening a PR / Babysit / Shipping"]
+ kind --> long["Autonomous run / Orchestrate / Autopilot-full / Autopilot-stack"]
+ kind --> session["Session pickup / Pause safely / Worktree and simulator cleanup"]
+ mode --> broad{"Large cross-cutting task or no playbook fits?"}
+ broad -->|yes| bespoke["figure-it-out: design a bespoke rigorous run"]
+ bespoke --> build
+ broad -->|standing multi-day program| long
+ mode -.-> triggers["Cross-cutting: how, architect, swarm, arena, interrogate;<br/>domain shape, principles, writing, controls, decision trail"]

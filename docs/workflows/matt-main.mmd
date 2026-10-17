@@ -1,0 +1,23 @@
+flowchart TB
+setup["setup-matt-pocock-skills: inspect repo; agree tracker, triage<br/>labels and domain doc layout; write config"] --> ask["ask-matt: select route"]
+ ask --> repo{"Working directory?"}
+ repo -->|yes| grill["grill-with-docs: grilling + domain-modeling; update GLOSSARY.md<br/>and ADRs"]
+ repo -->|no| stateless["grill-me: same grilling primitive without local documents"]
+ grill --> empirical{"Runnable answer needed?"}
+ stateless --> empirical
+ empirical -->|yes| handout["handoff out to fresh session / prototype directory"] --> prototype["prototype: throwaway logic or UI; expose state and alternatives"] --> handback["Capture verdict and prototype branch pointer; handoff back to<br/>original thread"] --> empirical
+ empirical -->|no| size{"Multi-session build?"}
+ size -->|no| implement["implement: fetch ticket if given; state title; agreed test seams"]
+ size -->|yes| spec["to-spec: explore repo + ADRs; select highest test seams; publish<br/>ready-for-agent spec"] --> tickets["to-tickets: gather context; draft vertical tracer bullets; quiz<br/>user; publish blocking edges"] --> mode{"Execution mode?"}
+ mode -->|drive tickets| fresh["Fresh session per self-contained ticket; blockers first"] --> implement
+ mode -->|whole spec| integration["implement-spec: read task graph; optional shared exploration<br/>notes; integration branch"] --> frontier["Run ready frontier in isolated worktrees with implementers"]
+ frontier --> tdd2["tdd per ticket; regular typechecks / focused tests; final suite"] --> merger["Merger integrates completed ticket; draft PR after first merge<br/>when needed"] --> more{"Tickets remain?"}
+ more -->|yes: recompute frontier| frontier
+ more -->|no| review2["code-review over integration branch: Standards + Spec"] --> fix2["One implementer fixes findings; ready PR or tracker closure;<br/>clean worktrees"]
+ implement --> tdd["tdd: one failing behavioral slice → minimal green → refactor;<br/>repeat"] --> checks["Regular typecheck and single test files; full suite at end"] --> review["code-review: pin fixed point; find spec and standards;<br/>independent axes; aggregate"] --> commit["Commit work on current branch"]
+ commit --> next{"More manually driven tickets?"}
+ next -->|yes| fresh
+ next -->|no| pr["pr: smallest useful visual + before / after proof + one-way /<br/>two-way door merge danger"]
+ fix2 --> pr
+ pr --> retro["retro: read session primary sources; propose environment<br/>improvements by severity"] --> environment["Mechanical mistakes → checks; judgment → coding standards;<br/>navigation, steering and tooling improvements feed next build"]
+ environment -.-> grill

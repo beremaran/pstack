@@ -1,0 +1,10 @@
+flowchart LR
+hub["Authorized issue automation"]
+ hub --> n0["setup-benny<br/>Configure authorized runner, immutable thread routing, tracker<br/>adapter, feature map and real app control → preflight<br/>integrations → verify safety before activation"]
+ click n0 "../../skills/setup-benny/SKILL.md" "Read workflow"
+ hub --> n1["triage-issue-reports<br/>Freeze source coordinates → read report → trace likely cause →<br/>classify and route → dedupe → qualify tracker creation → one<br/>verdict reply → one follow-up window"]
+ click n1 "../../skills/triage-issue-reports/SKILL.md" "Read workflow"
+ hub --> n2["reproduce-and-fix-issues<br/>Validate triage identity and source → ownership / existing-fix<br/>gates → control preflight → reproduce twice → reviewed<br/>evidence → verify existing fix or bounded new fix → prove<br/>twice → draft PR → cleanup"]
+ click n2 "../../skills/reproduce-and-fix-issues/SKILL.md" "Read workflow"
+ hub --> n3["make-bot-ui<br/>Establish provider webhook contract → keep secret server-side<br/>→ build controls and verify actual trigger → optional<br/>authorized tailnet exposure"]
+ click n3 "../../skills/make-bot-ui/SKILL.md" "Read workflow"

@@ -1,0 +1,13 @@
+flowchart TB
+boundary["Phase boundary"] --> q1{"Next phase needs primary-source reasoning,<br/>or enough reasoning context remains?"}
+ q1 -->|yes| continue["Continue in same session"]
+ q1 -->|no| q2{"Current context irrelevant to next task?"}
+ q2 -->|yes| fresh["Fresh session; previous one remains resumable"]
+ q2 -->|no| q3{"New harness, directory, colleague,<br/>or a mid-phase side-task fork?"}
+ q3 -->|yes| handoff["handoff: portable Markdown with artifact pointers"]
+ q3 -->|no| q4{"Tightly scoped task can run AFK?"}
+ q4 -->|yes| agent["Authorized subagent; report back; keep parent context"]
+ q4 -->|no| compact["Context compaction if supported; preserve next phase needs"]
+ compact --> unavailable["If unavailable: explicit summary / handoff and state information<br/>loss"]
+ policy["Context hygiene"] -.-> keep["Keep grill → spec → tickets unbroken where feasible;<br/>approaching reasoning limit → nearest boundary"]
+ policy -.-> ticket["Fresh implement context per ticket; retro before clearing or<br/>supply scoped session log"]

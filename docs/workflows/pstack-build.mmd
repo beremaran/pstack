@@ -1,0 +1,22 @@
+flowchart TB
+subgraph feature["Feature"]
+ f1["how: understand subsystem"] --> f2["Name data shape; architect: explore designs"] --> f3["Throughput checkpoint: blocking first steps; independent<br/>workstreams; shared mutable state; smallest safe decomposition"] --> f4["Scoped implementation with poteto-agent"] --> f5["Verify on real UI / CLI / artifact"] --> f6["Small ordered commits; interrogate contested design"]
+ f5 -->|fail| f4
+ end
+ subgraph bug["Bug fix"]
+ b1["Reproduce on matching surface; preserve failing proof"] --> b2["Binary-search root cause"] --> b3["Plan fix; architect if crossing a function boundary"] --> b4["Implement; tdd when cheap seam exists"] --> b5["Verify on same surface"] --> b6["Order repro commit before fix commit"]
+ b5 -->|still broken| b2
+ end
+ subgraph refactor["Refactoring"]
+ r1["how; pin current behavior with characterization / equivalence<br/>harness"] --> r2["Name missing structure and target shape; architect if needed"] --> r3["Subtract dead code first"] --> r4["Move in small green steps; migrate callers and delete old API"] --> r5["Prove output equivalence on real artifact"] --> r6{"Reader load reduced?"}
+ r5 -->|fail| r4
+ r6 -->|no| revert["Revert speculative cleanup"]
+ end
+ subgraph parity["Visual parity"]
+ v1["Capture immutable state-by-state baseline"] --> v2["Migrate shared primitives first; then isolated component owners"] --> v3{"Image diff zero with unchanged harness?"}
+ v3 -->|no| v2
+ end
+ f6 --> pr["Opening a PR"]
+ b6 --> pr
+ r6 -->|yes: ordered commits| pr
+ v3 -->|yes: component or safe batch| pr

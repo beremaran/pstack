@@ -123,3 +123,191 @@ python scripts/upstream.py apply --source mattpocock --stage /tmp/mattpocock-rev
 ```
 
 See [upstream updates](docs/upstream-updates.md) for review gates, rollback, and receipts. pstack's existing commands continue to work without `--source`.
+
+## Workflow diagrams
+
+These maps cover the vendored **81-skill pstack bundle**, all **23 poteto-mode playbooks**, and all **38 Matt Pocock skills**, including the seven experimental workflows. They describe this repository's portable adaptations at the pinned versions above. Arrows show execution or a labeled handoff; dotted arrows show supporting disciplines. Capability maps show alternatives, not mandatory stages. The linked skill and playbook files remain authoritative for detailed instructions.
+
+Diagrams are embedded as rendered SVGs so they display without a Mermaid plugin. Open an image for its full-size view; each **Mermaid source** link provides the editable diagram. Names in the Matt Pocock diagrams omit `mattpocock-` for readability. Delegation, background runs, external writes, and landing still depend on session authorization and host capabilities; self-review never substitutes for a required independent verifier.
+
+- [Pstack routing](#pstack-entry-points-and-routing), [build](#pstack-build-repair-refactor-and-prove), [measurement](#pstack-performance-and-forensics), [design](#pstack-prototype-plan-author-and-evaluate), [PR lifecycle](#pstack-open-babysit-and-ship), [autonomy](#pstack-bounded-runs-programs-and-autopilots), and [sessions](#pstack-pause-resume-and-cleanup).
+- [Matt Pocock main flow](#matt-pocock-idea-to-pr-and-retrospective), [on-ramps](#matt-pocock-triage-diagnosis-wayfinding-and-architecture), [context boundaries](#matt-pocock-context-boundary-decision-tree), [standalone tools](#matt-pocock-standalone-tools-and-supporting-disciplines), and [experimental workflows](#matt-pocock-all-seven-experimental-workflows).
+- Pstack capability maps and all 24 principles follow the main workflow diagrams.
+
+### Pstack: entry points and routing
+
+The router selects a playbook. Read-only investigations and prototypes end with evidence or a decision; implementation playbooks continue to the PR lifecycle.
+
+[![Pstack: entry points and routing](docs/workflows/pstack-routing.svg)](docs/workflows/pstack-routing.svg)
+
+[Mermaid source](docs/workflows/pstack-routing.mmd)
+
+### Pstack: build, repair, refactor, and prove
+
+Each lane retains its own contract. Failed checks loop back to the owning change; all shippable lanes enter Opening a PR.
+
+[![Pstack: build, repair, refactor, and prove](docs/workflows/pstack-build.svg)](docs/workflows/pstack-build.svg)
+
+[Mermaid source](docs/workflows/pstack-build.mmd)
+
+### Pstack: performance and forensics
+
+benchmark-checklist governs measurements. A diagnosis remains a diagnosis until a fix is requested.
+
+[![Pstack: performance and forensics](docs/workflows/pstack-measure.svg)](docs/workflows/pstack-measure.svg)
+
+[Mermaid source](docs/workflows/pstack-measure.mmd)
+
+### Pstack: prototype, plan, author, and evaluate
+
+These workflows produce decisions, plans, skills, or experimental evidence. A plan does not authorize its execution.
+
+[![Pstack: prototype, plan, author, and evaluate](docs/workflows/pstack-design.svg)](docs/workflows/pstack-design.svg)
+
+[Mermaid source](docs/workflows/pstack-design.mmd)
+
+### Pstack: open, babysit, and ship
+
+Opening a PR starts no watcher by itself. Babysit stops at merge-ready. Shipping requires authorization and independent verification.
+
+[![Pstack: open, babysit, and ship](docs/workflows/pstack-pr.svg)](docs/workflows/pstack-pr.svg)
+
+[Mermaid source](docs/workflows/pstack-pr.mmd)
+
+### Pstack: bounded runs, programs, and autopilots
+
+All modes retain operator gates and authorization limits. Serial self-review cannot satisfy an independent shipping gate.
+
+[![Pstack: bounded runs, programs, and autopilots](docs/workflows/pstack-autonomy.svg)](docs/workflows/pstack-autonomy.svg)
+
+[Mermaid source](docs/workflows/pstack-autonomy.mmd)
+
+### Pstack: pause, resume, and cleanup
+
+History is limited to the active workspace or an explicitly scoped export. Cleanup distinguishes recoverable branches from uncommitted or active work.
+
+[![Pstack: pause, resume, and cleanup](docs/workflows/pstack-session.svg)](docs/workflows/pstack-session.svg)
+
+[Mermaid source](docs/workflows/pstack-session.mmd)
+
+### Pstack: cross-cutting investigation, delegation, and evidence
+
+These disciplines are selected by the task’s triggers. Parallel work requires authorization and actual worker support; disclose serial fallbacks and any lost independence.
+
+[![Pstack: cross-cutting investigation, delegation, and evidence](docs/workflows/pstack-cross-cutting.svg)](docs/workflows/pstack-cross-cutting.svg)
+
+[Mermaid source](docs/workflows/pstack-cross-cutting.mmd)
+
+### Pstack: Benny issue automation
+
+This optional workflow requires a configured runner, authorized thread and tracker writes, and a real app control adapter. Its evidence-gated draft PR path is separate from poteto-mode’s ready-PR convention.
+
+[![Pstack: Benny issue automation](docs/workflows/pstack-benny.svg)](docs/workflows/pstack-benny.svg)
+
+[Mermaid source](docs/workflows/pstack-benny.mmd)
+
+### Matt Pocock: idea to PR and retrospective
+
+Labels omit the common mattpocock- prefix. Keep grilling, spec, and ticket creation in one context where possible; tickets carry the durable context for fresh implementation sessions.
+
+[![Matt Pocock: idea to PR and retrospective](docs/workflows/matt-main.svg)](docs/workflows/matt-main.svg)
+
+[Mermaid source](docs/workflows/matt-main.mmd)
+
+### Matt Pocock: triage, diagnosis, wayfinding, and architecture
+
+Generated to-tickets issues are already agent-ready and bypass triage. These entry points create or clarify work before implementation.
+
+[![Matt Pocock: triage, diagnosis, wayfinding, and architecture](docs/workflows/matt-onramps.svg)](docs/workflows/matt-onramps.svg)
+
+[Mermaid source](docs/workflows/matt-onramps.mmd)
+
+### Matt Pocock: context boundary decision tree
+
+The first yes wins at a phase boundary. Mid-phase, continue or delegate a scoped remainder. Missing host capabilities require the documented fallback.
+
+[![Matt Pocock: context boundary decision tree](docs/workflows/matt-context.svg)](docs/workflows/matt-context.svg)
+
+[Mermaid source](docs/workflows/matt-context.mmd)
+
+### Matt Pocock: standalone tools and supporting disciplines
+
+These can be entered directly or used within the main flow. Vocabulary and writing references support other workflows rather than adding mandatory phases.
+
+[![Matt Pocock: standalone tools and supporting disciplines](docs/workflows/matt-tools.svg)](docs/workflows/matt-tools.svg)
+
+[Mermaid source](docs/workflows/matt-tools.mmd)
+
+### Matt Pocock: all seven experimental workflows
+
+Experimental upstream workflows are included here deliberately. They are optional branches, not prerequisites of the engineering flow.
+
+[![Matt Pocock: all seven experimental workflows](docs/workflows/matt-experimental.svg)](docs/workflows/matt-experimental.svg)
+
+[Mermaid source](docs/workflows/matt-experimental.mmd)
+
+### Pstack: understand and recall
+
+Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
+
+[![Pstack: understand and recall](docs/workflows/pstack-support-1.svg)](docs/workflows/pstack-support-1.svg)
+
+[Mermaid source](docs/workflows/pstack-support-1.mmd)
+
+### Pstack: review and forge helpers
+
+Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
+
+[![Pstack: review and forge helpers](docs/workflows/pstack-support-2.svg)](docs/workflows/pstack-support-2.svg)
+
+[Mermaid source](docs/workflows/pstack-support-2.mmd)
+
+### Pstack: ci and verification helpers
+
+Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
+
+[![Pstack: ci and verification helpers](docs/workflows/pstack-support-3.svg)](docs/workflows/pstack-support-3.svg)
+
+[Mermaid source](docs/workflows/pstack-support-3.mmd)
+
+### Pstack: capture and improve workflows
+
+Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
+
+[![Pstack: capture and improve workflows](docs/workflows/pstack-support-4.svg)](docs/workflows/pstack-support-4.svg)
+
+[Mermaid source](docs/workflows/pstack-support-4.mmd)
+
+### Pstack: authorized issue automation
+
+Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
+
+[![Pstack: authorized issue automation](docs/workflows/pstack-support-5.svg)](docs/workflows/pstack-support-5.svg)
+
+[Mermaid source](docs/workflows/pstack-support-5.mmd)
+
+### Pstack: principles 1–8
+
+Principles are a conditional reference layer underneath all playbooks, not additional execution phases.
+
+[![Pstack: principles 1–8](docs/workflows/pstack-principles-1.svg)](docs/workflows/pstack-principles-1.svg)
+
+[Mermaid source](docs/workflows/pstack-principles-1.mmd)
+
+### Pstack: principles 9–16
+
+Principles are a conditional reference layer underneath all playbooks, not additional execution phases.
+
+[![Pstack: principles 9–16](docs/workflows/pstack-principles-2.svg)](docs/workflows/pstack-principles-2.svg)
+
+[Mermaid source](docs/workflows/pstack-principles-2.mmd)
+
+### Pstack: principles 17–24
+
+Principles are a conditional reference layer underneath all playbooks, not additional execution phases.
+
+[![Pstack: principles 17–24](docs/workflows/pstack-principles-3.svg)](docs/workflows/pstack-principles-3.svg)
+
+[Mermaid source](docs/workflows/pstack-principles-3.mmd)
+
+Diagram sources: [pstack router](skills/poteto-mode/SKILL.md), [23 playbooks](skills/poteto-mode/playbooks/), [supporting skill router](skills/poteto-help/SKILL.md), [Matt Pocock router](skills/mattpocock-ask-matt/SKILL.md), [phase boundaries](skills/mattpocock-ask-matt/PHASE-BOUNDARIES.md), and the canonical `skills/*/SKILL.md` files.

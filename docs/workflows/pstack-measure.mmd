@@ -1,0 +1,26 @@
+flowchart TB
+subgraph perf["Perf issue: one measured fix"]
+ p1["Capture baseline trace on matching surface"] --> p2["how: causal architecture model"] --> p3["Trace-grounded plan; architect if needed; implement"] --> p4["Capture post-fix trace; parse and compare"] --> p5{"Valid measurement and improvement?"}
+ p5 -->|no / inconclusive| p2
+ p5 -->|yes| p6["Cite before / after artifacts; Opening a PR"]
+ end
+ subgraph hill["Hillclimb: sustained improvement"]
+ h1["Ground workload and architecture; choose target"] --> h2["Prove harness sensitivity; freeze harness"] --> h3["show-me-your-work: decision log"] --> h4["Mechanism-grounded hypothesis"] --> h5["One change; interleaved before / after measurement"] --> h6{"Accepted win?"}
+ h6 -->|yes| h7["One commit per win; update model and log"]
+ h6 -->|no| h8["Discard change; record result"]
+ h7 --> h9{"Target met, budget exhausted, or remaining ideas marginal?"}
+ h8 --> h9
+ h9 -->|no: push past plateau| h4
+ h9 -->|yes| h10["Report predicate; Opening a PR for accepted wins"]
+ end
+ subgraph forensic["Forensics"]
+ input{"Live symptom or captured artifact?"} -->|live| live["Runtime forensics: capture CPU / heap / trace"]
+ live --> reduce["Reduce smoking gun; instrument live to prove mechanism"] --> source["Map finding to source symbol and line"]
+ input -->|captured| trace["Trace forensics: identify format; transform into queryable data"]
+ trace --> narrow["Query hot path / retainers / blocked thread"] --> symbols["Resolve source symbols"] --> pair{"Paired capture confirms?"}
+ pair -->|yes| confirmed["Confirmed cited diagnosis"]
+ pair -->|no| hypothesis["Strongest supported hypothesis; state gaps"]
+ source --> confirmed
+ confirmed --> hand["Return artifacts and diagnosis; Bug fix / Perf issue only when<br/>asked"]
+ hypothesis --> hand
+ end

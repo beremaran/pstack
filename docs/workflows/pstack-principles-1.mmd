@@ -1,0 +1,18 @@
+flowchart LR
+hub["Read applicable principle leaves; apply only to matching<br/>decisions"]
+ hub --> n0["principle-attack-the-premise<br/>Apply when two or more fixes that share one premise have failed<br/>the same gate. Write the premise down and test it directly<br/>before you write another fix that assumes it."]
+ click n0 "../../skills/principle-attack-the-premise/SKILL.md" "Read principle"
+ hub --> n1["principle-boundary-discipline<br/>Apply when wiring validation, error handling, or framework<br/>adapters. Concentrate guards at system boundaries (CLI, config,<br/>network, external APIs); trust internal types and keep business<br/>logic in pure functions."]
+ click n1 "../../skills/principle-boundary-discipline/SKILL.md" "Read principle"
+ hub --> n2["principle-build-the-lever<br/>Apply to any non-trivial work, not just bulk work: edits,<br/>migrations, analyses, checks. Build the tool that does it or<br/>proves it (codemod, script, generator, or a skill your subagents<br/>follow) instead of working by hand. The tool is the artifact a<br/>reviewer can rerun."]
+ click n2 "../../skills/principle-build-the-lever/SKILL.md" "Read principle"
+ hub --> n3["principle-encode-lessons-in-structure<br/>Apply when you catch yourself writing the same instruction a<br/>second time, or notice a recurring correction. Encode the rule<br/>as a lint, metadata flag, runtime check, or script instead of<br/>more text."]
+ click n3 "../../skills/principle-encode-lessons-in-structure/SKILL.md" "Read principle"
+ hub --> n4["principle-exhaust-the-design-space<br/>Apply when facing a novel UI interaction or architectural<br/>decision with no precedent in the codebase. Build 2-3 competing<br/>prototypes and compare side by side before committing."]
+ click n4 "../../skills/principle-exhaust-the-design-space/SKILL.md" "Read principle"
+ hub --> n5["principle-experience-first<br/>Apply when product, UX, or feature-scope tradeoffs come up.<br/>Choose user delight over implementation convenience; ship fewer<br/>polished features over more rough ones."]
+ click n5 "../../skills/principle-experience-first/SKILL.md" "Read principle"
+ hub --> n6["principle-explain-the-number<br/>Apply before you trust, report, or act on a number you measured:<br/>a speedup, a regression, a throughput, a latency, or an eval<br/>result. Find what limits it, and rule out that it measured<br/>something other than the work you think."]
+ click n6 "../../skills/principle-explain-the-number/SKILL.md" "Read principle"
+ hub --> n7["principle-fix-root-causes<br/>Apply when debugging. Trace each symptom back to the first place<br/>the system went wrong and fix it there. A guard is a fix only<br/>when the state it handles is legitimate."]
+ click n7 "../../skills/principle-fix-root-causes/SKILL.md" "Read principle"

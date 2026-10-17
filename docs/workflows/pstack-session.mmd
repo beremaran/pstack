@@ -1,0 +1,6 @@
+flowchart TB
+pause["Pause safely: reach safe boundary; no irreversible pause action"] --> durable["Make work durable; preserve local changes and safe commits /<br/>pushes within authority"] --> note["Write off-context resume note with pointers, current state and<br/>next action"]
+ note --> pickup["Session pickup: locate prior trail; read overview and decisions"] --> state["Reconstruct worktree, branch, git / PR state and pending todos"] --> diff["Diff done against pending; name resume point without redoing<br/>finished work"] --> route["Route to matching playbook; verify inherited claims on actual<br/>artifact"]
+ cleanup["Worktree and simulator cleanup: disk snapshot + worktree-audit"] --> active["Cross-check pinned / active chats and scoped transcripts"] --> loss{"Uncommitted work or in-use checkout?"}
+ loss -->|yes| hold["Show diff and usage; hold for user decision"]
+ loss -->|no; authorized| prune["Prune confirmed worktrees; keep branch refs; re-list and measure<br/>disk"] --> sims["Conditionally remove authorized stale simulators / runtimes and<br/>named safe caches"] --> report["Report reclaimed space and why held items remain"]

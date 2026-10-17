@@ -1,0 +1,26 @@
+flowchart TB
+ setup["setup-benny: authorized runner + scoped Slack / tracker adapters;<br/>feature map + real app control; preserve user-owned config"] --> safety["Verify thread-only replies, marker identity, worker write isolation,<br/>missing-coordinate fail-closed behavior, ownership and evidence gates"]
+ safety --> trigger["triage-issue-reports: freeze channel + root thread coordinates;<br/>verify parent and permalink; read report and attachments"]
+ trigger --> trace["Trace cause and existing changes → classify bug / performance /<br/>feature request / question / reroute; use explicit routing only"]
+ trace --> dedupe["Tracker adapter: resolve fields; dedupe confident and plausible matches"]
+ dedupe --> create{"Clearly broken live bug / performance issue,<br/>no live match, valid parent and compensating adapter?"}
+ create -->|yes| issue["Create tracker issue; compensate if verdict post fails"]
+ create -->|no| verdict["One configured verdict reply; one follow-up window"]
+ issue --> verdict
+ verdict --> contract{"reproduce-and-fix-issues:<br/>configured triage identity and marker confirmed?"}
+ contract -->|no| stop["Fail closed; no competing fix or unsupported post"]
+ contract -->|yes| ownership{"Explicit fixer or existing fix artifact?"}
+ ownership -->|active owner| stop
+ ownership -->|existing artifact| existing["Verify existing fix; reproduce before / after if available"]
+ ownership -->|unowned| control["Optional operations thread; check control adapter;<br/>study report and mapped feature"]
+ control --> repro["Reproduce twice independently; name expected and broken states;<br/>capture screenshots / recording and cross-check real state"]
+ repro --> evidence{"Reviewed evidence proves repro?"}
+ evidence -->|no| report["Report bounded outcome; no draft PR without proof"]
+ evidence -->|yes| qualify{"Bounded fix qualifies?"}
+ qualify -->|no| report
+ qualify -->|yes| fix["Root-cause and implement; repeat identical real UI path twice;<br/>show expected state, after recording and state cross-check"]
+ fix --> proof{"Fix evidence passes?"}
+ proof -->|no| fix
+ proof -->|yes| draft["Open draft PR with evidence; authorized thread follow-ups;<br/>clean processes and temporary test state"]
+ existing --> report
+ safety -.-> ui["make-bot-ui: documented webhook contract → server-side secret →<br/>verified control page; optional tailnet access"]

@@ -1,0 +1,18 @@
+flowchart LR
+hub["Review and forge helpers"]
+ hub --> n0["blast-radius<br/>Read diff → find load-bearing safety fact → trace dependencies<br/>and timing → quantify confirmed risks → prove safety with real<br/>code; arena for wide changes"]
+ click n0 "../../skills/blast-radius/SKILL.md" "Read workflow"
+ hub --> n1["review-and-ship<br/>Gather diff and intent → targeted tests → correctness /<br/>regression / security review → fix and retest → selective<br/>commit → authorized push and PR"]
+ click n1 "../../skills/review-and-ship/SKILL.md" "Read workflow"
+ hub --> n2["get-pr-comments<br/>Resolve PR → fetch review comments and threads → present<br/>actionable feedback with file and line context"]
+ click n2 "../../skills/get-pr-comments/SKILL.md" "Read workflow"
+ hub --> n3["make-pr-easy-to-review<br/>Inspect PR commits and scope → identify noise and missing<br/>evidence → propose history rewrite before applying → verify<br/>intended diff survives"]
+ click n3 "../../skills/make-pr-easy-to-review/SKILL.md" "Read workflow"
+ hub --> n4["new-branch-and-pr<br/>Preserve / handle existing changes → branch from latest main →<br/>implement and test → focused commits → authorized push and PR"]
+ click n4 "../../skills/new-branch-and-pr/SKILL.md" "Read workflow"
+ hub --> n5["pr-review-canvas<br/>Fetch PR and patches → analyze change → write reviewer HTML →<br/>safely assemble template and JSON → serve interactive review<br/>canvas"]
+ click n5 "../../skills/pr-review-canvas/SKILL.md" "Read workflow"
+ hub --> n6["thermo-nuclear-code-quality-review<br/>Apply quality rubric → inspect structural regressions,<br/>complexity, boundaries, types and file size → report concrete<br/>simplifications and approval blockers"]
+ click n6 "../../skills/thermo-nuclear-code-quality-review/SKILL.md" "Read workflow"
+ hub --> n7["comment-sicko<br/>Review comment text against the code → remove narration and<br/>redundant comments → retain explicit legal / public-contract / proven external-constraint exceptions; flag code reshape targets"]
+ click n7 "../../skills/comment-sicko/SKILL.md" "Read workflow"

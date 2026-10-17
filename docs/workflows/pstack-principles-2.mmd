@@ -1,0 +1,18 @@
+flowchart LR
+hub["Read applicable principle leaves; apply only to matching<br/>decisions"]
+ hub --> n0["principle-foundational-thinking<br/>Apply before writing logic: choosing core types and data<br/>structures, sequencing scaffold-vs-feature work, asking what<br/>concurrent actors share. Get the data structures right so<br/>downstream code becomes obvious."]
+ click n0 "../../skills/principle-foundational-thinking/SKILL.md" "Read principle"
+ hub --> n1["principle-guard-the-context-window<br/>Apply when context is filling up: large outputs, long files,<br/>repeated reads, fan-out planning. Route bulk to subagents; keep<br/>summaries in the main thread, not raw payloads."]
+ click n1 "../../skills/principle-guard-the-context-window/SKILL.md" "Read principle"
+ hub --> n2["principle-laziness-protocol<br/>Apply when refactoring, evaluating diff size, or tempted to add<br/>abstractions, layers, or signal threading. Bias toward deletion<br/>and the smallest change that solves the problem."]
+ click n2 "../../skills/principle-laziness-protocol/SKILL.md" "Read principle"
+ hub --> n3["principle-make-operations-idempotent<br/>Apply when designing commands, lifecycle steps, or processing<br/>loops that run amid crashes, restarts, and retries. Converge to<br/>the same end state regardless of partial prior runs."]
+ click n3 "../../skills/principle-make-operations-idempotent/SKILL.md" "Read principle"
+ hub --> n4["principle-migrate-callers-then-delete-legacy-apis<br/>Apply when introducing a new internal API while old callers<br/>still exist. Migrate callers and delete the old API in the same<br/>wave instead of preserving compatibility layers."]
+ click n4 "../../skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md" "Read principle"
+ hub --> n5["principle-minimize-reader-load<br/>Apply when reviewing or shaping code that's hard to trace.<br/>Count layers between question and answer, and hidden state in<br/>the reader's head; collapse one-caller wrappers and shrink<br/>mutable scope."]
+ click n5 "../../skills/principle-minimize-reader-load/SKILL.md" "Read principle"
+ hub --> n6["principle-model-the-domain<br/>Apply when writing stateful logic, or when code branches a lot<br/>or repeats a shape assumption across files."]
+ click n6 "../../skills/principle-model-the-domain/SKILL.md" "Read principle"
+ hub --> n7["principle-never-block-on-the-human<br/>Apply when tempted to ask 'should I do X?' on<br/>reversible work."]
+ click n7 "../../skills/principle-never-block-on-the-human/SKILL.md" "Read principle"

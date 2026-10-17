@@ -1,0 +1,27 @@
+flowchart TB
+open1["Opening a PR: isolated writers; preserve unrelated work"] --> open2["deslop before commit; no-comments before review"] --> open3["Small ordered commits; technical-writing + unslop"] --> open4["Resolve forge; built-in PR tool if provided; ready PR targeting<br/>trunk or exact parent branch"] --> open5["Read back status; post evidence and URL; keep building"]
+ open5 --> ask{"Separate request to babysit?"}
+ ask -->|no| stop["Return to build / report"]
+ ask -->|yes| mode["Declare mode: check / threads-only / background / drive"]
+ mode --> frontier["One babysitter per stack; lowest unmerged PR only; no topology<br/>writes"]
+ frontier --> conflict{"Conflict or stale base?"}
+ conflict -->|yes| owner["Report required rebase and drift sweep to topology owner; stop"]
+ conflict -->|no| threads["Triage threads: fix / dismiss with evidence / ask; batch fixes<br/>in owning PR"]
+ threads --> ci{"CI failure class?"}
+ ci -->|own code| fix["Red-first fix; push one wave; rearm watcher"]
+ ci -->|flake / infrastructure| retry["One fresh build; identical second failure → reclassify and<br/>inspect logs"]
+ fix --> frontier
+ retry --> frontier
+ ci -->|no blockers| ready["Forge merge-ready: GitHub READY or queued WAITING / merge-queue;<br/>Origin mergeable with green checks and no unresolved blockers"]
+ ready --> grant{"Explicit landing authority?"}
+ grant -->|no| wait["Stop at merge-ready; report human gates"]
+ grant -->|yes| verify["Shipping: independent per-PR real-surface verdict<br/>PASS / PASS+NOTES / FAIL"]
+ verify --> run["Choose contiguous verified run from bottom; first missing<br/>verdict is ceiling"]
+ run --> drift{"Patch still covered by verdict?"}
+ drift -->|no| verify
+ drift -->|yes; fresh checks| merge["Merge lowest PR; read back actual merged state on trunk"]
+ merge --> landed{"Merged rather than merely queued?"}
+ landed -->|no| watch["Watch; diagnose stall; freeze stack writes"] --> landed
+ landed -->|yes| next["Retarget next child to trunk; move patch; push with lease"] --> ceiling{"Reached ceiling?"}
+ ceiling -->|no: recheck patch-id and CI| drift
+ ceiling -->|yes| done["Stop; extending run needs new verification pass"]

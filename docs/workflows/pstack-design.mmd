@@ -1,0 +1,14 @@
+flowchart TB
+subgraph prototype["Prototype"]
+ p1["Name decision; no decision → Feature"] --> p2["Gather prior art if direction open"] --> p3["Isolated throwaway sketch; labeled alternatives behind switcher"] --> p4["Drive surface; capture screenshots / observed behavior / timing"] --> p5["Tradeoffs and recommendation; hand chosen direction to Feature /<br/>architect"]
+ end
+ subgraph plan["Multi-phase or multi-PR plan"]
+ n1{"One or two obvious files?"} -->|yes| n0["Skip plan and stop"]
+ n1 -->|no| n2["Prototype empirical questions; explore code with scoped workers"] --> n3["Fill plan template; one verifiable PR per section"] --> n4["Name dependency graph, execution playbook, unit / live / perf<br/>gates and operator review gates"] --> n5["technical-writing → unslop → check-plan; fix every finding"] --> n6["Return plan and check output; stop until explicit go"]
+ end
+ subgraph author["Authoring or modifying a skill"]
+ a1["create-skill"] --> a2["Validate frontmatter, resources, cross-skill links"] --> a3["Structural change: test cases; subjective change: state skip"] --> a4["Opening a PR"]
+ end
+ subgraph experiment["Eval"]
+ e1["Frame variant and private rubric"] --> e2["Sanitized isolated environments; one organic prompt"] --> e3["arena: candidates; blinded judge on different family"] --> e4["Audit actual file reads in scoped transcripts and code shape"] --> e5["Read every output; reconcile judge disagreement"] --> e6["Synthesize evidence; promote or reject variant"]
+ end

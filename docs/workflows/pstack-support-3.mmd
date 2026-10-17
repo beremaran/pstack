@@ -1,0 +1,20 @@
+flowchart LR
+hub["CI and verification helpers"]
+ hub --> n0["check-compiler-errors<br/>Run project compiler / typecheck → inspect errors → fix within<br/>scope → rerun and report remaining failures"]
+ click n0 "../../skills/check-compiler-errors/SKILL.md" "Read workflow"
+ hub --> n1["verify-this<br/>Falsifiable claim and threshold → smallest disproof surface →<br/>baseline and identical treatment → compare raw artifacts →<br/>VERIFIED / NOT VERIFIED / INCONCLUSIVE"]
+ click n1 "../../skills/verify-this/SKILL.md" "Read workflow"
+ hub --> n2["run-smoke-tests<br/>Build app prerequisites → focused smoke run → inspect failure<br/>traces → minimal fix → repeat until stable"]
+ click n2 "../../skills/run-smoke-tests/SKILL.md" "Read workflow"
+ hub --> n3["create-verification-skill<br/>Inspect repository and real control harness → generate launch<br/>/ drive skill → seed feature map → prove generated skill live<br/>→ offer maintenance"]
+ click n3 "../../skills/create-verification-skill/SKILL.md" "Read workflow"
+ hub --> n4["maintain-verification-skill<br/>Locate target → reconcile feature index → read-only source<br/>wave → consolidate recipes → required live pass → classify doc<br/>drift / harness gap / bug → proven corrections PR or clean /<br/>blocked report"]
+ click n4 "../../skills/maintain-verification-skill/SKILL.md" "Read workflow"
+ hub --> n5["fix-merge-conflicts<br/>Inspect conflicted files and both sides of intent → resolve<br/>while preserving intended behavior → verify and report"]
+ click n5 "../../skills/fix-merge-conflicts/SKILL.md" "Read workflow"
+ hub --> n6["fix-ci<br/>Inspect PR checks and first actionable failed log → smallest<br/>safe fix → authorized push → recheck full PR check set until<br/>green"]
+ click n6 "../../skills/fix-ci/SKILL.md" "Read workflow"
+ hub --> n7["loop-on-ci<br/>Resolve PR → inspect failures before waiting → watch pending<br/>checks → diagnose and fix → recheck full set after each push"]
+ click n7 "../../skills/loop-on-ci/SKILL.md" "Read workflow"
+ hub --> n8["ci-watcher<br/>Resolve current branch and PR → inspect checks → watch pending<br/>checks fail-fast → return green state or actionable failure<br/>logs / link"]
+ click n8 "../../skills/ci-watcher/SKILL.md" "Read workflow"
