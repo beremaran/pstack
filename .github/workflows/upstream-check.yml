@@ -1,0 +1,58 @@
+name: Check pstack upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Fetch source packs
+        shell: bash
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/cursor/plugins.git "$RUNNER_TEMP/pstack-upstream"
+          git -C "$RUNNER_TEMP/pstack-upstream" sparse-checkout set pstack cursor-team-kit
+          base=$(python -c 'import json; print(json.load(open("upstream/pstack-lock.json"))["commit"])')
+          git -C "$RUNNER_TEMP/pstack-upstream" fetch --depth 1 origin "$base"
+      - name: Compare and stage for review
+        id: compare
+        shell: bash
+        run: |
+          python scripts/upstream.py check --checkout "$RUNNER_TEMP/pstack-upstream" --ref origin/main > "$RUNNER_TEMP/upstream-report.json"
+          python scripts/upstream.py stage --checkout "$RUNNER_TEMP/pstack-upstream" --ref origin/main --output "$RUNNER_TEMP/upstream-review"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = json.loads((Path(os.environ['RUNNER_TEMP']) / 'upstream-report.json').read_text())
+          count = len(report['changes'])
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'changed={str(count > 0).lower()}\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"Compared {report['baseCommit']} to {report['commit']}.\n\n")
+              summary.write(f'{count} upstream files changed. Download the review artifact when changes are present.\n')
+              summary.write('The workflow does not modify the port, advance its baseline, or publish anything.\n')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: steps.compare.outputs.changed == 'true'
+        with:
+          name: pstack-upstream-review
+          path: |
+            ${{ runner.temp }}/upstream-report.json
+            ${{ runner.temp }}/upstream-review/
+          include-hidden-files: true
+          retention-days: 30
+      - name: Flag updates
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          echo 'Upstream changes need review. Download the staged artifact and follow docs/upstream-updates.md.'
+          exit 1
