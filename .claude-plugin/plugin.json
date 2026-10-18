@@ -1,9 +1,10 @@
 {
   "name": "pstack",
   "version": "0.15.25-port.3",
-  "description": "Portable pstack, companion kit, Benny, and Matt Pocock workflows for coding agents.",
+  "description": "Portable pstack workflows for Codex, Claude Code, OpenCode, and Pi.",
   "author": {
-    "name": "beremaran; upstream Lauren Tan and Eric Zakariasson; Matt Pocock"
+    "name": "beremaran",
+    "url": "https://github.com/beremaran"
   },
   "license": "MIT"
 }

@@ -55,18 +55,4 @@ A successful update writes `upstream/updates/<commit>.json` with the source tran
 
 ## Verify the updated port
 
-Run the structural validator, installation checks, updater tests, supervisor tests, and affected bundled script tests. Run native inventory checks on available hosts and behavioral tests appropriate to changed workflows. Record versions and the distinction between a loader check, fixture-backed execution, and a live model workflow in `docs/pstack-verification.md`. Publish changes only through the repository's normal reviewed process.
-
-## Additional source: Matt Pocock
-
-The same commands support `--source mattpocock` for [the Matt Pocock vendor](mattpocock-port.md). Omit the flag for the existing pstack behavior. Use a separate source checkout and fresh staging directory for each repository:
-
-```sh
-python scripts/upstream.py check --source mattpocock --checkout /path/to/mattpocock-skills --fetch
-python scripts/upstream.py stage --source mattpocock --checkout /path/to/mattpocock-skills --output /tmp/mattpocock-review
-python scripts/upstream.py apply --source mattpocock --stage /tmp/mattpocock-review
-```
-
-The baseline is `upstream/mattpocock-lock.json`; it tracks the entire upstream repository. Skill paths `skills/<category>/<name>/...` map to `skills/mattpocock-<name>/...`; licenses have a distinct notice. All other changes are explicit review entries. Preserve the namespace and portability adaptations when merging. The plan records source package version/development dependency metadata as evidence, not instructions to install those packages.
-
-Source identity is stored in each stage; applying it under another source is refused. Both sources share the same apply lock, so updates cannot write concurrently. Validation checks all source inventories for duplicate ownership. Receipts for this source live under `upstream/updates/mattpocock/`; pstack's receipt paths and commands remain unchanged. Weekly Actions uses a two-source matrix with independent failures and named artifacts. This workflow extension has been checked locally; it has not yet been published or executed on GitHub.
+Run the structural validator and the updater tests, then check the changed workflows on the hosts you can exercise. Record versions and the distinction between a loader check, fixture-backed execution, and a live model workflow with the update receipt or pull request notes. Publish changes only through the repository's normal reviewed process.

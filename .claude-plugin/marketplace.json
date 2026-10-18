@@ -1,0 +1,14 @@
+{
+  "name": "pstack",
+  "owner": {
+    "name": "beremaran",
+    "url": "https://github.com/beremaran"
+  },
+  "description": "Portable pstack workflows for coding agents: engineering playbooks, principles, and supporting skills.",
+  "plugins": [
+    {
+      "name": "pstack",
+      "source": "./"
+    }
+  ]
+}

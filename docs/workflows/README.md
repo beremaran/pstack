@@ -12,12 +12,12 @@ From the repository root, render an updated source:
 
 ```sh
 /tmp/skill-diagram-tools/node_modules/.bin/mmdc \
-  -i docs/workflows/matt-main.mmd \
-  -o docs/workflows/matt-main.svg \
+  -i docs/workflows/pstack-routing.mmd \
+  -o docs/workflows/pstack-routing.svg \
   -c docs/workflows/mermaid-config.json \
   --no-font-embed -b white
 ```
 
 Use Mermaid CLI's `-p` option with a local Puppeteer configuration if the browser needs an explicit executable path. Keep machine-specific browser configuration outside the repository. The shared rendering config uses SVG text rather than HTML labels, so the exported diagrams do not depend on embedded HTML support. No renderer or browser is required to view the committed images.
 
-Check every changed diagram renders, inspect its labels and branches, and verify README image/source links. Compare the maps against `skills/poteto-mode/SKILL.md`, its 23 playbooks, `skills/poteto-help/SKILL.md`, all `skills/mattpocock-*/SKILL.md` files, and the phase-boundary reference. This is diagram validation, not runtime verification of those workflows on any agent.
+Check every changed diagram renders, inspect its labels and branches, and verify README image/source links. Compare the maps against `skills/poteto-mode/SKILL.md`, its 23 playbooks, and `skills/poteto-help/SKILL.md`. This is diagram validation, not runtime verification of those workflows on any agent.
