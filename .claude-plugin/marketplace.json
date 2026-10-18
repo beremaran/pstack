@@ -1,0 +1,13 @@
+{
+  "name": "pstack",
+  "owner": {
+    "name": "beremaran",
+    "url": "https://github.com/beremaran"
+  },
+  "plugins": [
+    {
+      "name": "pstack",
+      "source": "./"
+    }
+  ]
+}

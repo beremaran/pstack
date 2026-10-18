@@ -1,10 +1,19 @@
 {
-  "name": "beremaran-pstack-skills",
+  "name": "pstack",
   "version": "0.15.25-port.3",
   "private": true,
-  "description": "Portable pstack, companion kit, Benny, and Matt Pocock workflows for coding agents.",
+  "description": "Portable pstack workflows for coding agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beremaran/pstack.git"
+  },
   "keywords": [
-    "pi-package"
+    "pi-package",
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "opencode"
   ],
   "pi": {
     "skills": [

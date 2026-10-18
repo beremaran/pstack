@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "pstack",
+  "version": "0.15.25-port.3",
+  "description": "Portable pstack workflows for coding agents: engineering playbooks, principles, and supporting skills.",
+  "author": {
+    "name": "beremaran",
+    "url": "https://github.com/beremaran"
+  },
+  "homepage": "https://github.com/beremaran/pstack",
+  "repository": "https://github.com/beremaran/pstack",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "opencode",
+    "pi"
+  ]
+}

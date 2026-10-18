@@ -56,9 +56,28 @@ for lock_path in sorted((ROOT / 'upstream').glob('*-lock.json')):
         owners[name] = lock_path.name
         if not (ROOT / 'skills' / name / 'SKILL.md').is_file():
             errors.append(f'Missing upstream skill: {name}')
-json.loads((ROOT / '.claude-plugin/plugin.json').read_text())
-assert json.loads((ROOT / 'package.json').read_text())['pi']['skills'] == ['./skills']
+try:
+    manifests = {}
+    for name in ['plugin.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json',
+                 '.agents/plugins/marketplace.json', 'package.json', 'opencode.json']:
+        manifests[name] = json.loads((ROOT / name).read_text())
+    agent_plugin = manifests['plugin.json']
+    claude_plugin = manifests['.claude-plugin/plugin.json']
+    package = manifests['package.json']
+    assert agent_plugin['$schema'] == 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json', 'portable manifest schema'
+    assert agent_plugin['name'] == claude_plugin['name'] == package['name'], 'manifest names differ'
+    assert agent_plugin['version'] == claude_plugin['version'] == package['version'], 'manifest versions differ'
+    claude_entry = manifests['.claude-plugin/marketplace.json']['plugins']
+    codex_entry = manifests['.agents/plugins/marketplace.json']['plugins']
+    assert len(claude_entry) == 1 and claude_entry[0]['name'] == claude_plugin['name'], 'Claude marketplace entry differs'
+    assert len(codex_entry) == 1 and codex_entry[0]['name'] == agent_plugin['name'], 'Codex marketplace entry differs'
+    assert claude_entry[0]['source'] == './', 'Claude plugin source must be the repository root'
+    assert codex_entry[0]['source']['path'] == './', 'Codex plugin source must be the repository root'
+    assert package['pi']['skills'] == ['./skills'], 'Pi package skills path'
+    assert manifests['opencode.json']['skills'] == ['./skills'], 'OpenCode skills path'
+except Exception as exc:
+    errors.append(f'host manifests: {exc}')
 if errors:
     print('\n'.join(errors), file=sys.stderr)
     sys.exit(1)
-print(f'Validated {len(skills)} skills, bundled links, runtime references, dependency inventory, and manifests.')
+print(f'Validated {len(skills)} skills, bundled links, runtime references, dependency inventory, and host manifests.')
