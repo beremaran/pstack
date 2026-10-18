@@ -41,8 +41,11 @@ class UpdateTests(unittest.TestCase):
         (self.port / 'upstream').mkdir()
         (self.port / 'scripts').mkdir()
         shutil.copy2(REAL_ROOT / 'scripts/validate-skills.py', self.port / 'scripts/validate-skills.py')
-        shutil.copytree(REAL_ROOT / '.claude-plugin', self.port / '.claude-plugin')
-        shutil.copy2(REAL_ROOT / 'package.json', self.port / 'package.json')
+        for name in ['plugin.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json',
+                     '.agents/plugins/marketplace.json', 'package.json', 'opencode.json']:
+            target = self.port / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(REAL_ROOT / name, target)
         upstream.ROOT = self.port
         upstream.LOCK = self.port / 'upstream/pstack-lock.json'
         upstream.write_json(upstream.LOCK, {'repository':'fixture', 'commit':self.old,
