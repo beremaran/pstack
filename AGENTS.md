@@ -1,6 +1,6 @@
 # Repository guidance
 
-This is a personal skills repository. Every shared skill must work with Codex, Claude Code, OpenCode, and Pi.
+This repository packages the pstack bundle for general use. Every shared skill must work with Codex, Claude Code, OpenCode, and Pi.
 
 ## Structure
 
@@ -16,7 +16,7 @@ This is a personal skills repository. Every shared skill must work with Codex, C
 - Describe required capabilities by purpose rather than assuming a particular agent's tool names, slash commands, hooks, plugins, or subagent APIs.
 - When a workflow needs a specific CLI, integration, runtime, or credential, state the prerequisite and how to proceed when it is unavailable.
 - Isolate optional agent-specific metadata and adapters from the shared workflow. Document their scope and preserve a usable path for all four agents.
-- Maintain one source per skill; installation should copy or link that source into the target agent's discovery directory.
+- Maintain one source per skill; hosts load the canonical `skills/` tree through their native package mechanisms, or receive a copy in their discovery directory.
 - Verify current official documentation before changing discovery paths or claiming support for an agent-specific feature.
 
 ## Authoring and verification

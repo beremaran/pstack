@@ -32,7 +32,7 @@ Benny's configuration and operational safety constraints remain intact. Setup no
 
 ## Portability decisions
 
-Shared instructions describe capabilities and keep one source per skill. Every entrypoint reads [pstack-runtime](../skills/pstack-runtime/SKILL.md). The Claude manifest and Pi package metadata load that same tree; the installer copies it to each host's supported discovery directory. OpenCode and Codex need no executable plugin for these workflows.
+Shared instructions describe capabilities and keep one source per skill. Every entrypoint reads [pstack-runtime](../skills/pstack-runtime/SKILL.md). The Claude and Codex marketplace manifests and the Pi package metadata all load that same tree; the `skills` CLI copies it into each host's supported discovery directory. No host needs executable extension or hook code for these workflows.
 
 Models default to the parent, and per-host role overrides live in project `.pstack/models.md`. Unsupported model controls are reported. Parallel work uses supported delegation or explicitly authorized separate CLI processes with independent checkouts, or explicitly labeled serial self-review. Shipping still requires an independent verifier. Host-specific task fields, private history paths, magic model suffixes, native loops, and cloud-agent assumptions have been removed.
 
@@ -40,7 +40,7 @@ The canonical frontmatter uses common fields and normal automatic discovery. Ups
 
 Upstream's generic permission grants and destructive checkout-reset shortcuts were replaced with the current session's authorization and preservation of unrelated work. The migration does not authorize posting messages, creating tickets, enabling automations, merging, deploying, or deleting data by itself.
 
-Source README/guide prose, logos, and the old Cursor/Claude adapter are not runtime dependencies. They are replaced by the portable help skill and repository documentation. MIT notices for both source packs are retained under `upstream/` and copied with staged installs.
+Source README/guide prose, logos, and the old Cursor/Claude adapter are not runtime dependencies. They are replaced by the portable help skill and repository documentation. MIT notices for both source packs are retained under `upstream/`.
 
 ## Updating
 

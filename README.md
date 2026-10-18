@@ -1,62 +1,104 @@
-# Personal skills
+# pstack
 
-Reusable agent skills for Codex, Claude Code, OpenCode, and Pi.
+Portable agent skills for engineering work. Pstack packages 81 skills — playbooks for build, repair, diagnosis, planning, review, the PR lifecycle, and session hygiene, plus the principles and supporting disciplines underneath them — as one canonical source tree that loads natively in Claude Code, Codex (CLI and Desktop), OpenCode, and Pi.
 
-Each skill lives in `skills/<name>/SKILL.md` with YAML `name` and `description` fields. Supporting scripts, references, and assets stay inside its directory. This repository is the canonical source; install individual skill directories into the discovery location supported by your agent.
+Start with `poteto-mode` for engineering work, `poteto-help` to find the right playbook, and `setup-pstack` for optional per-role model configuration.
 
-See [AGENTS.md](AGENTS.md) for authoring and compatibility requirements.
+Each skill lives in `skills/<name>/SKILL.md` with YAML `name` and `description` fields. Supporting scripts, references, and assets stay inside its directory. See [AGENTS.md](AGENTS.md) for authoring and compatibility requirements.
 
-Agent documentation: [Codex](https://developers.openai.com/codex/skills), [Claude Code](https://code.claude.com/docs/en/skills), [OpenCode](https://opencode.ai/docs/skills/), and [Pi](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md).
+## Install
 
-## Pstack bundle
+The repository root is the package. Every host below loads or copies the same `skills/` tree.
 
-This repository ports pstack 0.15.25 and its complete cursor-team-kit 1.2.0 companion into 81 canonical skills. Start with `poteto-mode` for engineering work, `poteto-help` for routing, and `setup-pstack` for optional per-role model configuration. See [migration scope and dependencies](docs/pstack-port.md) and [verification results](docs/pstack-verification.md). The installer also includes 38 namespaced [Matt Pocock workflows](docs/mattpocock-port.md), for 119 skills in total.
+### Claude Code
 
-### Install skills
+Add the marketplace and install the plugin in one step (Claude Code 2.1.275 or later):
 
-Python 3.9+ is required for the installer. From this checkout, choose your agent:
-
-```sh
-python scripts/install-skills.py --agent claude --project /path/to/project
-python scripts/install-skills.py --agent codex --project /path/to/project
-python scripts/install-skills.py --agent opencode --project /path/to/project
-python scripts/install-skills.py --agent pi --project /path/to/project
+```
+/plugin install pstack --marketplace beremaran/pstack
 ```
 
-Use `--dry-run` to preview, or `--user` instead of `--project` for a personal install. The installer copies the whole bundle, supporting resources, attribution, and source inventory. It refuses existing skill paths before copying anything. For updates, stage with `--dest /path/to/staging`, review differences, and merge deliberately. No credentials, host settings, integrations, or dependencies are installed by this command.
+On older versions, run the two steps separately:
+
+```
+/plugin marketplace add beremaran/pstack
+/plugin install pstack@pstack
+```
+
+Plugin skills use the plugin namespace, for example `/pstack:poteto-mode`. During development, `claude --plugin-dir /path/to/pstack` loads a checkout directly. See the [plugin reference](https://code.claude.com/docs/en/plugins-reference).
+
+### Codex
+
+```sh
+codex plugin marketplace add beremaran/pstack
+codex plugin add pstack@pstack
+```
+
+Codex Desktop reads the same `pstack` marketplace.
+
+### Pi
+
+```sh
+pi install git:github.com/beremaran/pstack
+```
+
+Add `-l` for a project-local install. Pi's [package format](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/packages.md) reads `package.json`, which exposes only `skills/` with no extensions or hooks.
+
+### OpenCode
+
+OpenCode V2 loads every directory named in the `skills` array of `opencode.json`. This checkout ships that config, so OpenCode finds all 81 skills while you work inside the checkout. To use pstack in another project, point your own config at the checkout:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": ["/path/to/pstack/skills"]
+}
+```
+
+Relative paths resolve from the OpenCode working directory; `~/` and absolute paths also work. See the [OpenCode skills docs](https://opencode.ai/v2/docs/skills/).
+
+### Any agent, via the skills CLI
+
+```sh
+npx skills add beremaran/pstack
+```
+
+The CLI detects installed agents and links the skills into their discovery directories (`--copy` to copy files instead). Use `-a` to pick agents (`claude-code`, `codex`, `opencode`, `pi`), `-s` to pick skills, and `-l` to list what the package contains before installing.
+
+### Manual install
+
+Every host also loads a plain directory copy. Put each `skills/<name>/` directory into the host's discovery path and restart the host:
 
 | Agent | Project discovery | User discovery | Invocation |
 | --- | --- | --- | --- |
 | Claude Code | `.claude/skills/` | `~/.claude/skills/` | `/poteto-mode` |
 | Codex | `.agents/skills/` | `~/.agents/skills/` | `$poteto-mode` |
-| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` | Ask to use `poteto-mode` |
+| OpenCode | `.opencode/skills/` | `~/.config/opencode/skills/` | `@poteto-mode` |
 | Pi | `.pi/skills/` | `~/.pi/agent/skills/` | `/skill:poteto-mode` |
 
-Restart or reload the host after installation. Avoid installing duplicate copies into discovery locations the same host also scans. Pi's user path above assumes its default agent directory; use `--dest` if `PI_CODING_AGENT_DIR` differs. OpenCode's user path assumes the default XDG config root; use `--dest` for a custom one. Paths were checked against current [Claude](https://code.claude.com/docs/en/skills), [Codex](https://developers.openai.com/codex/skills), [OpenCode](https://opencode.ai/docs/skills/), and [Pi](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/configuration.md) documentation.
+Avoid installing duplicate copies into discovery locations the same host also scans. Pi's user path assumes its default agent directory; `PI_CODING_AGENT_DIR` changes it. OpenCode's user path assumes the default XDG config root.
 
-### Native packaging
+## What's included
 
-Claude Code can load this checkout as a local plugin:
+The port covers pstack 0.15.25 (54 skills and 23 playbooks) and its complete cursor-team-kit 1.2.0 companion, plus a shared runtime contract and packaging, for 81 skills total. Compatibility is a requirement, not a claim that every workflow was executed on every host; see [migration scope, dependencies, and provenance](docs/pstack-port.md) and the pinned source inventory in [pstack-lock.json](upstream/pstack-lock.json).
 
-```sh
-claude --plugin-dir /absolute/path/to/beremaran-skills
-```
+Repository manifests:
 
-Its skills use the plugin namespace, for example `/pstack:poteto-mode`. The root `.claude-plugin/plugin.json` uses the canonical `skills/` tree. Repository `CLAUDE.md` is contributor guidance; plugin behavior is carried by the skills themselves. See the [Claude plugin reference](https://code.claude.com/docs/en/plugins-reference).
+| File | Purpose |
+| --- | --- |
+| `plugin.json` | Agent Plugins 1.0.0 manifest: package name, version, and entry points |
+| `.claude-plugin/marketplace.json` | Claude Code marketplace; the adjacent `plugin.json` is its plugin manifest |
+| `.agents/plugins/marketplace.json` | Codex marketplace (Codex Desktop also reads the Claude marketplace) |
+| `opencode.json` | OpenCode skill sources for this checkout |
+| `package.json` | Pi package metadata (`pi.skills`) |
 
-Pi can install this checkout as a [local Pi package](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/packages.md):
+`scripts/validate-skills.py` checks that the manifests agree on name, version, and the root skill source.
 
-```sh
-pi install /absolute/path/to/beremaran-skills -l
-```
-
-The root `package.json` exposes only `skills/`, with no extensions or hooks. Choose either package/plugin loading or a copied skills install for each host. Codex and OpenCode use their documented skill directories here; no executable plugin is needed.
-
-### Runtime requirements
+## Runtime requirements
 
 All workflows read the shared [runtime contract](skills/pstack-runtime/SKILL.md). Models inherit the current session unless configured in `<project>/.pstack/models.md`. Delegation and integrations are optional capabilities; serial self-review is labeled and cannot satisfy independent shipping gates. History mining uses only explicitly scoped history. Native loops, cloud agents, schedulers, and Cursor APIs are replaced by capability-based workflows.
 
-Bun is needed for `poteto-mode`'s orchestration and PR-watcher scripts. Install their locked dependencies before running them:
+Bun runs `poteto-mode`'s orchestration and PR-watcher scripts. Install their locked dependencies before running them:
 
 ```sh
 cd skills/poteto-mode/scripts
@@ -67,71 +109,43 @@ bun run typecheck
 
 GitHub workflows need authenticated `gh` or a supported forge integration. Browser and terminal verification reuse existing harnesses. Benny needs a separately configured and authorized runner, Slack/tracker integrations, and an app control adapter. Missing integrations remain explicit evidence gaps.
 
-### Validate changes
+## Supervised execution
+
+The bundle includes a local supervisor for separate CLI workers, repeat-until tasks, detached runs, stop requests, and bounded resume. It saves state and checks the actual artifact instead of accepting a worker's success claim, and needs no native loop command or cloud worker. See [supervised runs](skills/pstack-runtime/references/supervised-runs.md) and [host adapters](skills/pstack-runtime/references/hosts.md) for prerequisites, permissions, and configuration.
+
+The supervisor requires Python 3.9+ on a POSIX host. Claude and Codex CLI workers can need launch from a normal terminal rather than an enclosing sandbox. Missing authentication, unsupported host capabilities, and execution limits are explicit non-passes. The adapters add no permission bypass.
+
+## Validate changes
 
 Install PyYAML in your development environment, then run:
 
 ```sh
 python scripts/validate-skills.py
-python scripts/test-install-skills.py
+python scripts/test-upstream.py
+python -m unittest discover -s skills/pstack-runtime/scripts -p 'test_*.py'
 claude plugin validate .
 ```
 
-The port retains upstream MIT notices under [upstream/](upstream/), with the pinned commit and source file hashes in [pstack-lock.json](upstream/pstack-lock.json).
+`claude plugin validate .` checks the Claude marketplace and plugin manifests, and is optional when Claude Code is not installed.
 
-### Supervised execution and host checks
+## Upstream updates
 
-The bundle now includes a local supervisor for separate CLI workers, repeat-until tasks, detached runs, stop requests, and bounded resume. It saves state and checks the actual artifact instead of accepting an agent's success claim. It does not require a native loop command or provision cloud infrastructure. See [supervised runs](skills/pstack-runtime/references/supervised-runs.md) and [host adapters](skills/pstack-runtime/references/hosts.md) for prerequisites, permissions, and configuration.
-
-Native inventory checks send no model prompts:
-
-```sh
-python scripts/check-host-loading.py --agent codex
-python scripts/check-host-loading.py --agent opencode
-python scripts/check-host-loading.py --agent pi
-python scripts/check-host-loading.py --agent claude --claude-init /path/to/private/startup-transcript.jsonl
-```
-
-For repeatable behavioral testing, `python scripts/smoke-host.py prepare --agent <agent> --output /tmp/pstack-smoke-<agent>` creates an isolated TDD fixture and supervisor configuration. Preparation uses no model. Review the native host's permissions and configuration before running it; live execution uses that host's authentication and can incur model usage. Verify the artifact with `smoke-host.py verify --project <fixture-project> --transcript <native-jsonl-log>` to check behavior, preserved user files, and failing-before evidence from native tool events.
-
-The supervisor requires Python 3.9+ on a POSIX host. Claude and Codex CLI workers can need launch from a normal terminal rather than an enclosing sandbox. Missing authentication, unsupported host capabilities, and execution limits are explicit non-passes. No permission bypass is added by the adapters.
-
-### Upstream updates
-
-[Track and update upstream](docs/upstream-updates.md) describes the pinned baseline, source comparison, staged three-way merges, mandatory review decisions, validation, and update receipts. `.github/workflows/upstream-check.yml` supplies a weekly read-only check and downloadable review artifacts once Actions is enabled in the published repository. It never applies or publishes updates.
+[Track and update upstream](docs/upstream-updates.md) describes the pinned baseline, source comparison, staged three-way merges, mandatory review decisions, validation, and update receipts. `.github/workflows/upstream-check.yml` supplies a weekly read-only check and downloadable review artifacts. It never applies or publishes updates.
 
 ```sh
 python scripts/upstream.py check --checkout /path/to/cursor-plugins --fetch --ref origin/main
 python scripts/upstream.py stage --checkout /path/to/cursor-plugins --ref origin/main --output /tmp/pstack-review
 ```
 
-After reviewing every entry and merge candidate, use `upstream.py apply --stage /tmp/pstack-review`. It refuses stale local files and unresolved decisions, preserves intentional divergences, and rolls back validation failures. Run `python scripts/test-upstream.py` and `python -m unittest discover -s skills/pstack-runtime/scripts -p 'test_*.py'` when changing this tooling.
-
-### Matt Pocock workflows
-
-Also vendored: all **38** skills from [mattpocock/skills](https://github.com/mattpocock/skills), including its seven experimental workflows, pinned to upstream version 1.3.1. They use `mattpocock-*` names to preserve the existing pstack variants. Start with [mattpocock-ask-matt](skills/mattpocock-ask-matt/SKILL.md). The same installer and native packages now include **119** canonical skills.
-
-[Coverage, adaptations, and prerequisites](docs/mattpocock-port.md) and [verification evidence](docs/mattpocock-verification.md) distinguish portable workflows from optional native integrations. Explicit-only intent and Codex policies are retained where possible; equivalent discovery filtering is not claimed for every host.
-
-The weekly read-only upstream check covers both repositories. To inspect and take Matt Pocock updates while preserving local adaptations:
-
-```sh
-python scripts/upstream.py check --source mattpocock --checkout /path/to/mattpocock-skills --fetch
-python scripts/upstream.py stage --source mattpocock --checkout /path/to/mattpocock-skills --output /tmp/mattpocock-review
-# Review plan.json, resolve candidates, and record every decision and reason.
-python scripts/upstream.py apply --source mattpocock --stage /tmp/mattpocock-review
-```
-
-See [upstream updates](docs/upstream-updates.md) for review gates, rollback, and receipts. pstack's existing commands continue to work without `--source`.
+After reviewing every entry and merge candidate, `upstream.py apply --stage /tmp/pstack-review` refuses stale local files and unresolved decisions, preserves intentional divergences, and rolls back validation failures.
 
 ## Workflow diagrams
 
-These maps cover the vendored **81-skill pstack bundle**, all **23 poteto-mode playbooks**, and all **38 Matt Pocock skills**, including the seven experimental workflows. They describe this repository's portable adaptations at the pinned versions above. Arrows show execution or a labeled handoff; dotted arrows show supporting disciplines. Capability maps show alternatives, not mandatory stages. The linked skill and playbook files remain authoritative for detailed instructions.
+These maps cover the **81-skill pstack bundle** and all **23 poteto-mode playbooks**. They describe this repository's portable adaptations at the pinned version above. Arrows show execution or a labeled handoff; dotted arrows show supporting disciplines. Capability maps show alternatives, not mandatory stages. The linked skill and playbook files remain authoritative for detailed instructions.
 
-Diagrams are embedded as rendered SVGs so they display without a Mermaid plugin. Open an image for its full-size view; each **Mermaid source** link provides the editable diagram. Names in the Matt Pocock diagrams omit `mattpocock-` for readability. Delegation, background runs, external writes, and landing still depend on session authorization and host capabilities; self-review never substitutes for a required independent verifier.
+Diagrams are embedded as rendered SVGs so they display without a Mermaid plugin. Open an image for its full-size view; each **Mermaid source** link provides the editable diagram. Delegation, background runs, external writes, and landing still depend on session authorization and host capabilities; self-review never substitutes for a required independent verifier.
 
 - [Pstack routing](#pstack-entry-points-and-routing), [build](#pstack-build-repair-refactor-and-prove), [measurement](#pstack-performance-and-forensics), [design](#pstack-prototype-plan-author-and-evaluate), [PR lifecycle](#pstack-open-babysit-and-ship), [autonomy](#pstack-bounded-runs-programs-and-autopilots), and [sessions](#pstack-pause-resume-and-cleanup).
-- [Matt Pocock main flow](#matt-pocock-idea-to-pr-and-retrospective), [on-ramps](#matt-pocock-triage-diagnosis-wayfinding-and-architecture), [context boundaries](#matt-pocock-context-boundary-decision-tree), [standalone tools](#matt-pocock-standalone-tools-and-supporting-disciplines), and [experimental workflows](#matt-pocock-all-seven-experimental-workflows).
 - Pstack capability maps and all 24 principles follow the main workflow diagrams.
 
 ### Pstack: entry points and routing
@@ -206,46 +220,6 @@ This optional workflow requires a configured runner, authorized thread and track
 
 [Mermaid source](docs/workflows/pstack-benny.mmd)
 
-### Matt Pocock: idea to PR and retrospective
-
-Labels omit the common mattpocock- prefix. Keep grilling, spec, and ticket creation in one context where possible; tickets carry the durable context for fresh implementation sessions.
-
-[![Matt Pocock: idea to PR and retrospective](docs/workflows/matt-main.svg)](docs/workflows/matt-main.svg)
-
-[Mermaid source](docs/workflows/matt-main.mmd)
-
-### Matt Pocock: triage, diagnosis, wayfinding, and architecture
-
-Generated to-tickets issues are already agent-ready and bypass triage. These entry points create or clarify work before implementation.
-
-[![Matt Pocock: triage, diagnosis, wayfinding, and architecture](docs/workflows/matt-onramps.svg)](docs/workflows/matt-onramps.svg)
-
-[Mermaid source](docs/workflows/matt-onramps.mmd)
-
-### Matt Pocock: context boundary decision tree
-
-The first yes wins at a phase boundary. Mid-phase, continue or delegate a scoped remainder. Missing host capabilities require the documented fallback.
-
-[![Matt Pocock: context boundary decision tree](docs/workflows/matt-context.svg)](docs/workflows/matt-context.svg)
-
-[Mermaid source](docs/workflows/matt-context.mmd)
-
-### Matt Pocock: standalone tools and supporting disciplines
-
-These can be entered directly or used within the main flow. Vocabulary and writing references support other workflows rather than adding mandatory phases.
-
-[![Matt Pocock: standalone tools and supporting disciplines](docs/workflows/matt-tools.svg)](docs/workflows/matt-tools.svg)
-
-[Mermaid source](docs/workflows/matt-tools.mmd)
-
-### Matt Pocock: all seven experimental workflows
-
-Experimental upstream workflows are included here deliberately. They are optional branches, not prerequisites of the engineering flow.
-
-[![Matt Pocock: all seven experimental workflows](docs/workflows/matt-experimental.svg)](docs/workflows/matt-experimental.svg)
-
-[Mermaid source](docs/workflows/matt-experimental.mmd)
-
 ### Pstack: understand and recall
 
 Capability branches below are alternatives selected by task, not a sequence. Each node links to its full canonical workflow.
@@ -310,4 +284,8 @@ Principles are a conditional reference layer underneath all playbooks, not addit
 
 [Mermaid source](docs/workflows/pstack-principles-3.mmd)
 
-Diagram sources: [pstack router](skills/poteto-mode/SKILL.md), [23 playbooks](skills/poteto-mode/playbooks/), [supporting skill router](skills/poteto-help/SKILL.md), [Matt Pocock router](skills/mattpocock-ask-matt/SKILL.md), [phase boundaries](skills/mattpocock-ask-matt/PHASE-BOUNDARIES.md), and the canonical `skills/*/SKILL.md` files.
+Diagram sources: [pstack router](skills/poteto-mode/SKILL.md), [23 playbooks](skills/poteto-mode/playbooks/), [supporting skill router](skills/poteto-help/SKILL.md), and the canonical `skills/*/SKILL.md` files.
+
+## License and attribution
+
+Pstack is a maintained fork of [cursor/plugins](https://github.com/cursor/plugins) pstack 0.15.25 (MIT, Lauren Tan) and its cursor-team-kit 1.2.0 companion (MIT, Cursor), pinned at commit [101b274](https://github.com/cursor/plugins/tree/101b274dd991f694e1f7024be2157e5f3adf07de/pstack). Both notices are retained under [upstream/](upstream/). The portable adaptations and packaging in this repository are MIT licensed.

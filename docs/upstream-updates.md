@@ -55,4 +55,4 @@ A successful update writes `upstream/updates/<commit>.json` with the source tran
 
 ## Verify the updated port
 
-Run the structural validator and the updater tests, then check the changed workflows on the hosts you can exercise. Record versions and the distinction between a loader check, fixture-backed execution, and a live model workflow in `docs/pstack-verification.md`. Publish changes only through the repository's normal reviewed process.
+Run the structural validator and the updater tests, then check the changed workflows on the hosts you can exercise. Record versions and the distinction between a loader check, fixture-backed execution, and a live model workflow with the update receipt or pull request notes. Publish changes only through the repository's normal reviewed process.
