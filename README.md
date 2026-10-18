@@ -1,6 +1,6 @@
 # pstack
 
-Portable agent skills for engineering work. Pstack packages 81 skills — playbooks for build, repair, diagnosis, planning, review, the PR lifecycle, and session hygiene, plus the principles and supporting disciplines underneath them — as one canonical source tree that loads natively in Claude Code, Codex (CLI and Desktop), OpenCode, and Pi.
+Portable agent skills for engineering work. Pstack packages 81 skills as one canonical source tree that loads natively in Claude Code, Codex (CLI and Desktop), OpenCode, and Pi: playbooks for build, repair, diagnosis, planning, review, the PR lifecycle, and session hygiene, plus the principles and support skills they rely on.
 
 Start with `poteto-mode` for engineering work, `poteto-help` to find the right playbook, and `setup-pstack` for optional per-role model configuration.
 
