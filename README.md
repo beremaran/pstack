@@ -126,7 +126,7 @@ python -m unittest discover -s skills/pstack-runtime/scripts -p 'test_*.py'
 claude plugin validate .
 ```
 
-`claude plugin validate .` checks the Claude marketplace and plugin manifests, and is optional when Claude Code is not installed.
+`claude plugin validate .` checks the Claude marketplace and plugin manifests, and is optional when Claude Code is not installed. `.github/workflows/validate.yml` runs these checks on pull requests and pushes to `main`.
 
 ## Upstream updates
 
